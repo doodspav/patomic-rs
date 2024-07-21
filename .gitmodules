@@ -1,0 +1,3 @@
+[submodule "patomic"]
+	path = patomic
+	url = https://github.com/doodspav/patomic
