@@ -20,7 +20,6 @@ fn generate_patomic_bindings(bindings_file: &Path, patomic_include_dir: &Path) {
     let bindings = bindgen::Builder::default()
         .header(patomic_header_path.to_str().unwrap())
         .clang_arg(format!("-I{}", patomic_include_dir.display()))
-        .must_use_type(".*")
         .generate_cstr(true)
         .allowlist_item("^(patomic|PATOMIC)_.*")
         .generate()
@@ -36,15 +35,19 @@ fn main() {
     // build and install patomic
     let cmake_install_dir = cmake::Config::new("patomic")
         .define("CMAKE_INSTALL_INCLUDEDIR", "include")
-        .define("BUILD_SHARED_LIBS", "ON")
+        .define("BUILD_SHARED_LIBS", "OFF")
         .build();
-    print!("{:?}", cmake_install_dir);
+
+    // link patomic
+    let patomic_lib_dir = cmake_install_dir.join("lib");
+    println!("cargo::rustc-link-search=native={}", patomic_lib_dir.display());
+    println!("cargo::rustc-link-lib=static=patomic");
 
     // conditionally re-generate patomic cffi bindings
     #[cfg(feature = "bindgen")]
     {
         let bindings_file = Path::new("src/gen/cffi.rs");
-        let cmake_include_dir = cmake_install_dir.join("include");
-        generate_patomic_bindings(bindings_file, cmake_include_dir.as_path())
+        let patomic_include_dir = cmake_install_dir.join("include");
+        generate_patomic_bindings(bindings_file, patomic_include_dir.as_path())
     }
 }
