@@ -1,6 +1,17 @@
 [package]
 name = "patomic"
+license = "MIT OR Apache-2.0"
 version = "0.1.0"
-edition = "2024"
+
+edition = "2021"
+rust-version = "1.65"
+
+readme = "README.md"
+description = "Safe bindings to the patomic C library."
+documentation = "https://docs.rs/patomic"
+repository = "https://github.com/doodspav/patomic-rs"
+categories = ["concurrency", "api-bindings"]
+keywords = ["patomic", "atomics", "concurrency"]
 
 [dependencies]
+patomic-sys = { version = "0.1.0", path = "../patomic-sys" }
