@@ -1,3 +1,8 @@
+// Copyright (c) doodspav.
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
+pub mod ops;
+
 pub fn sub(left: u64, right: u64) -> u64 {
     left - right
 }
