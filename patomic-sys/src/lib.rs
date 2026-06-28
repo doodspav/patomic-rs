@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 mod align;
+mod combine;
 mod core;
 mod feature_check;
 mod ids;
@@ -11,6 +12,7 @@ mod options;
 mod transaction;
 
 pub use align::*;
+pub use combine::*;
 pub use core::*;
 pub use feature_check::*;
 pub use ids::*;
