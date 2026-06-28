@@ -1,0 +1,3 @@
+[submodule "vendor/patomic"]
+	path = patomic-sys/vendor/patomic
+	url = https://github.com/doodspav/patomic

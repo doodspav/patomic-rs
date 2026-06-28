@@ -1,0 +1,43 @@
+[package]
+name = "patomic-sys"
+license = "MIT OR Apache-2.0"
+version = "0.1.0"
+
+edition = "2021"
+rust-version = "1.65"
+links = "patomic"
+build = "build.rs"
+
+readme = "README.md"
+description = "Low-level bindings to the patomic C library."
+documentation = "https://docs.rs/patomic-sys"
+repository = "https://github.com/doodspav/patomic-rs"
+categories = [
+    "concurrency",
+    "external-ffi-bindings",
+    "no-std",
+]
+keywords = [
+    "patomic",
+    "atomics",
+    "concurrency",
+    "lock-free",
+    "transactional-memory",
+]
+
+include = [
+    "Cargo.toml",
+    "README.md",
+    "build.rs",
+    "src/**",
+
+    "vendor/patomic/CMakeLists.txt",
+    "vendor/patomic/LICENSE.txt",
+    "vendor/patomic/README.md",
+    "vendor/patomic/cmake/**",
+    "vendor/patomic/include/**",
+    "vendor/patomic/src/**",
+]
+
+[build-dependencies]
+cmake = "=0.1.58"
