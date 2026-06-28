@@ -16,6 +16,7 @@ mod memory_order;
 mod ops;
 mod options;
 mod transaction;
+mod version;
 
 pub use align::*;
 pub use combine::*;
@@ -26,3 +27,4 @@ pub use memory_order::*;
 pub use ops::*;
 pub use options::*;
 pub use transaction::*;
+pub use version::*;
