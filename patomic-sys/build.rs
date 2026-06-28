@@ -2,6 +2,7 @@ fn main() {
     // build the vendored patomic library statically
     let install_prefix = cmake::Config::new("vendor/patomic")
         .define("BUILD_SHARED_LIBS", "OFF")
+        .define("BUILD_TESTING", "OFF")
         .define("CMAKE_INSTALL_LIBDIR", "lib")
         .build();
 

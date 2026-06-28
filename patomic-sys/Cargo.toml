@@ -25,5 +25,19 @@ keywords = [
     "transactional-memory",
 ]
 
+include = [
+    "Cargo.toml",
+    "README.md",
+    "build.rs",
+    "src/**",
+
+    "vendor/patomic/CMakeLists.txt",
+    "vendor/patomic/LICENSE.txt",
+    "vendor/patomic/README.md",
+    "vendor/patomic/cmake/**",
+    "vendor/patomic/include/**",
+    "vendor/patomic/src/**",
+]
+
 [build-dependencies]
 cmake = "=0.1.58"
