@@ -1,9 +1,9 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use crate::transaction::*;
-
 use core::ffi::{c_int, c_uchar, c_ulong, c_void};
+
+use crate::transaction::*;
 
 pub type patomic_opsig_transaction_store_t = Option<
     unsafe extern "C" fn(

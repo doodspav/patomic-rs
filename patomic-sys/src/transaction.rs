@@ -1,9 +1,9 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use crate::PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE;
-
 use core::ffi::{c_int, c_uchar, c_ulong, c_void};
+
+use crate::PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE;
 
 pub type patomic_transaction_flag_t = c_uchar;
 
