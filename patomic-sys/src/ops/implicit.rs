@@ -130,4 +130,3 @@ pub struct patomic_ops_t {
     pub binary_ops: patomic_ops_binary_t,
     pub arithmetic_ops: patomic_ops_arithmetic_t,
 }
-
