@@ -3,12 +3,14 @@
 
 mod align;
 mod ids;
+mod memory_order;
 mod ops;
 mod options;
 mod transaction;
 
 pub use align::*;
 pub use ids::*;
+pub use memory_order::*;
 pub use ops::*;
 pub use options::*;
 pub use transaction::*;
