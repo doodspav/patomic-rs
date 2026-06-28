@@ -3,10 +3,12 @@
 
 mod align;
 mod ops;
+mod options;
 mod transaction;
 
 pub use align::*;
 pub use ops::*;
+pub use options::*;
 pub use transaction::*;
 
 pub fn sub(left: u64, right: u64) -> u64 {
