@@ -44,6 +44,12 @@ mod tests {
     use super::*;
 
     #[test]
+    fn version_string_is_not_null() {
+        let version_ptr = unsafe { patomic_version_string() };
+        assert!(!version_ptr.is_null());
+    }
+
+    #[test]
     fn version_constants_match_runtime() {
         unsafe {
             assert_eq!(PATOMIC_VERSION_MAJOR, patomic_version_major());
