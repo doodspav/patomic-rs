@@ -12,8 +12,18 @@ readme = "README.md"
 description = "Low-level bindings to the patomic C library."
 documentation = "https://docs.rs/patomic-sys"
 repository = "https://github.com/doodspav/patomic-rs"
-categories = ["concurrency", "external-ffi-bindings"]
-keywords = ["patomic", "atomics", "concurrency"]
+categories = [
+    "concurrency",
+    "external-ffi-bindings",
+    "no-std",
+]
+keywords = [
+    "patomic",
+    "atomics",
+    "concurrency",
+    "lock-free",
+    "transactional-memory",
+]
 
 [build-dependencies]
 cmake = "=0.1.58"

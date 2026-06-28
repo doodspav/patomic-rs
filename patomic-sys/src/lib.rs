@@ -1,6 +1,12 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+#![no_std]
+
+#![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
+#![allow(non_upper_case_globals)]
+
 mod align;
 mod combine;
 mod core;
@@ -20,18 +26,3 @@ pub use memory_order::*;
 pub use ops::*;
 pub use options::*;
 pub use transaction::*;
-
-pub fn sub(left: u64, right: u64) -> u64 {
-    left - right
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = sub(6, 2);
-        assert_eq!(result, 4);
-    }
-}
