@@ -39,7 +39,6 @@ unsafe extern "C" {
 use core::ffi::CStr;
 
 #[cfg(test)]
-
 mod tests {
     use super::*;
 

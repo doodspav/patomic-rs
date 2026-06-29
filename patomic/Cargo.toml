@@ -1,7 +1,7 @@
 [package]
 name = "patomic"
 license = "MIT OR Apache-2.0"
-version = "0.1.0"
+version = "1.1.0"
 
 edition = "2021"
 rust-version = "1.65"
@@ -14,4 +14,4 @@ categories = ["concurrency", "api-bindings"]
 keywords = ["patomic", "atomics", "concurrency"]
 
 [dependencies]
-patomic-sys = { version = "0.1.0", path = "../patomic-sys" }
+patomic-sys = { version = "1.1.0", path = "../patomic-sys" }
