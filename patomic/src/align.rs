@@ -66,15 +66,12 @@ impl PartialOrd for Alignment {
 pub trait AlignmentRequirements {
     fn alignment(&self) -> Alignment;
 
-    fn meets_recommended(&self, bytes: &[u8]) -> bool {
+    fn meets_alignment(&self, bytes: &[u8]) -> bool {
         let ptr = bytes.as_ptr() as *const c_void;
         let align = self.alignment().into();
-        unsafe { patomic_align_meets_recommended(ptr, align) != 0 }
-    }
-
-    fn meets_minimum(&self, bytes: &[u8]) -> bool {
-        let ptr = bytes.as_ptr() as *const c_void;
-        let align = self.alignment().into();
-        unsafe { patomic_align_meets_minimum(ptr, align, bytes.len()) != 0 }
+        unsafe {
+            patomic_align_meets_recommended(ptr, align) != 0
+                || patomic_align_meets_minimum(ptr, align, bytes.len()) != 0
+        }
     }
 }
