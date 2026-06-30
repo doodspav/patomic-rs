@@ -40,6 +40,25 @@ macro_rules! do_implicit_checks {
     };
 }
 
+macro_rules! do_implicit_checks_bit_test {
+    (
+        $ops:expr,
+        $fp:ident,
+        $obj:ident
+        $(, $bytes:ident)* ;
+        $offset:ident $(,)?
+    ) => {
+        // do initial checks
+        do_implicit_checks!($ops, $fp, $obj $(, $bytes)*);
+
+        // check that offset does not go out of bounds
+        let bit_width = $obj.len() * (u8::BITS as usize);
+        if $offset >= bit_width || $offset > c_int::MAX as usize {
+            return Err(Error::InvalidOffset);
+        }
+    };
+}
+
 pub trait ImplicitOps: AtomicLayout {
     fn ffi_ops() -> patomic_ops_t;
 
@@ -116,19 +135,55 @@ pub trait ImplicitOps: AtomicLayout {
     }
 
     fn bit_test(obj: &[u8], offset: usize) -> Result<bool> {
-        todo!()
+        do_implicit_checks_bit_test!(
+            Self::ffi_ops().bitwise_ops, fp_test,
+            obj; offset
+        );
+        Ok(unsafe {
+            fp_test(
+                obj.as_ptr() as *const c_void,
+                offset as c_int,
+            ) != 0
+        })
     }
 
     fn bit_test_compl(obj: &mut [u8], offset: usize) -> Result<bool> {
-        todo!()
+        do_implicit_checks_bit_test!(
+            Self::ffi_ops().bitwise_ops, fp_test_compl,
+            obj; offset
+        );
+        Ok(unsafe {
+            fp_test_compl(
+                obj.as_ptr() as *mut c_void,
+                offset as c_int,
+            ) != 0
+        })
     }
 
     fn bit_test_set(obj: &mut [u8], offset: usize) -> Result<bool> {
-        todo!()
+        do_implicit_checks_bit_test!(
+            Self::ffi_ops().bitwise_ops, fp_test_set,
+            obj; offset
+        );
+        Ok(unsafe {
+            fp_test_set(
+                obj.as_ptr() as *mut c_void,
+                offset as c_int,
+            ) != 0
+        })
     }
 
     fn bit_test_reset(obj: &mut [u8], offset: usize) -> Result<bool> {
-        todo!()
+        do_implicit_checks_bit_test!(
+            Self::ffi_ops().bitwise_ops, fp_test_reset,
+            obj; offset
+        );
+        Ok(unsafe {
+            fp_test_reset(
+                obj.as_ptr() as *mut c_void,
+                offset as c_int,
+            ) != 0
+        })
     }
 
     fn or(obj: &mut [u8], arg: &[u8]) -> Result<()> {
