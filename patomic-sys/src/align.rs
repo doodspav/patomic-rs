@@ -2,14 +2,15 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use core::ffi::{c_int, c_void};
+use core::num::NonZeroUsize;
 
 pub const PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE: usize = 128;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct patomic_align_t {
-    pub recommended: usize,
-    pub minimum: usize,
+    pub recommended: NonZeroUsize,
+    pub minimum: NonZeroUsize,
     pub size_within: usize,
 }
 

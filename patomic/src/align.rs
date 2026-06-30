@@ -3,18 +3,19 @@
 
 use core::cmp::Ordering;
 use core::ffi::c_void;
+use core::num::NonZeroUsize;
 
 use patomic_sys::*;
 
 pub trait AtomicLayout {
-    fn size() -> usize;
+    fn size() -> NonZeroUsize;
     fn alignment() -> Alignment;
 }
 
 #[derive(Debug, Copy, Clone)]
 pub struct Alignment {
-    pub recommended: usize,
-    pub minimum: usize,
+    pub recommended: NonZeroUsize,
+    pub minimum: NonZeroUsize,
     pub size_within: usize,
 }
 
