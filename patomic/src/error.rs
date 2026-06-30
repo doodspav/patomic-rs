@@ -5,6 +5,7 @@
 pub enum Error {
     InvalidSize,
     InvalidAlignment,
+    InvalidOffset,
     InvalidMemoryOrder,
     InvalidFailOrder,
     UnsupportedOperation,
@@ -17,6 +18,7 @@ impl core::fmt::Display for Error {
         match self {
             Self::InvalidSize => write!(f, "invalid size"),
             Self::InvalidAlignment => write!(f, "invalid alignment"),
+            Self::InvalidOffset => write!(f, "invalid offset"),
             Self::InvalidMemoryOrder => write!(f, "invalid memory order"),
             Self::InvalidFailOrder => write!(f, "invalid fail order"),
             Self::UnsupportedOperation => write!(f, "unsupported operation"),
