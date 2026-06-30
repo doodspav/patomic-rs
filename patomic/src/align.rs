@@ -23,10 +23,11 @@ impl Alignment {
     fn is_met_by(&self, bytes: &[u8]) -> bool {
         let ptr = bytes.as_ptr() as *const c_void;
         let align = (*self).into();
-        unsafe {
-            patomic_align_meets_recommended(ptr, align) != 0
-                || patomic_align_meets_minimum(ptr, align, bytes.len()) != 0
-        }
+        let Some(width) = NonZeroUsize::new(bytes.len()) else {
+            return false;
+        };
+        PATOMIC_ALIGN_MEETS_RECOMMENDED(ptr, align)
+            || PATOMIC_ALIGN_MEETS_MINIMUM(ptr, align, width)
     }
 }
 
