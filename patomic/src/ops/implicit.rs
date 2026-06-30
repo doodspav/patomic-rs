@@ -46,7 +46,7 @@ pub trait ImplicitOps: AtomicLayout {
     fn store(obj: &mut [u8], desired: &[u8]) -> Result<()> {
         do_implicit_checks!(
             Self::ffi_ops(), fp_store,
-            obj, desired
+            obj, desired,
         );
         Ok(unsafe {
             fp_store(
@@ -59,7 +59,7 @@ pub trait ImplicitOps: AtomicLayout {
     fn load(obj: &[u8], ret: &mut [u8]) -> Result<()> {
         do_implicit_checks!(
             Self::ffi_ops(), fp_load,
-            obj, ret
+            obj, ret,
         );
         Ok(unsafe {
             fp_load(
@@ -72,7 +72,7 @@ pub trait ImplicitOps: AtomicLayout {
     fn exchange(obj: &mut [u8], desired: &[u8], ret: &mut [u8]) -> Result<()> {
         do_implicit_checks!(
             Self::ffi_ops().xchg_ops, fp_exchange,
-            obj, desired, ret
+            obj, desired, ret,
         );
         Ok(unsafe {
             fp_exchange(
@@ -88,7 +88,7 @@ pub trait ImplicitOps: AtomicLayout {
     ) -> Result<bool> {
         do_implicit_checks!(
             Self::ffi_ops().xchg_ops, fp_cmpxchg_weak,
-            obj, desired, expected
+            obj, desired, expected,
         );
         Ok(unsafe {
             fp_cmpxchg_weak(
@@ -104,7 +104,7 @@ pub trait ImplicitOps: AtomicLayout {
     ) -> Result<bool> {
         do_implicit_checks!(
             Self::ffi_ops().xchg_ops, fp_cmpxchg_strong,
-            obj, desired, expected
+            obj, desired, expected,
         );
         Ok(unsafe {
             fp_cmpxchg_strong(
@@ -129,5 +129,109 @@ pub trait ImplicitOps: AtomicLayout {
 
     fn bit_test_reset(obj: &mut [u8], offset: usize) -> Result<bool> {
         todo!()
+    }
+
+    fn or(obj: &mut [u8], arg: &[u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().binary_ops, fp_or,
+            obj, arg,
+        );
+        Ok(unsafe {
+            fp_or(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+            )
+        })
+    }
+
+    fn xor(obj: &mut [u8], arg: &[u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().binary_ops, fp_xor,
+            obj, arg,
+        );
+        Ok(unsafe {
+            fp_xor(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+            )
+        })
+    }
+
+    fn and(obj: &mut [u8], arg: &[u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().binary_ops, fp_and,
+            obj, arg,
+        );
+        Ok(unsafe {
+            fp_and(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+            )
+        })
+    }
+
+    fn not(obj: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().binary_ops, fp_not,
+            obj,
+        );
+        Ok(unsafe {
+            fp_not(obj.as_mut_ptr() as *mut c_void)
+        })
+    }
+
+    fn fetch_or(obj: &mut [u8], arg: &[u8], ret: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().binary_ops, fp_fetch_or,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_or(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
+    }
+
+    fn fetch_xor(obj: &mut [u8], arg: &[u8], ret: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().binary_ops, fp_fetch_xor,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_xor(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
+    }
+
+    fn fetch_and(obj: &mut [u8], arg: &[u8], ret: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().binary_ops, fp_fetch_and,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_and(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
+    }
+
+    fn fetch_not(obj: &mut [u8], ret: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().binary_ops, fp_fetch_not,
+            obj, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_not(
+                obj.as_mut_ptr() as *mut c_void,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
     }
 }
