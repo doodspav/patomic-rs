@@ -13,6 +13,17 @@ pub struct Alignment {
     pub size_within: usize,
 }
 
+impl Alignment {
+    fn is_met_by(&self, bytes: &[u8]) -> bool {
+        let ptr = bytes.as_ptr() as *const c_void;
+        let align = (*self).into();
+        unsafe {
+            patomic_align_meets_recommended(ptr, align) != 0
+                || patomic_align_meets_minimum(ptr, align, bytes.len()) != 0
+        }
+    }
+}
+
 impl From<patomic_align_t> for Alignment {
     fn from(value: patomic_align_t) -> Self {
         Self {
@@ -60,18 +71,5 @@ impl Ord for Alignment {
 impl PartialOrd for Alignment {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
-    }
-}
-
-pub trait AlignmentRequirements {
-    fn alignment(&self) -> Alignment;
-
-    fn meets_alignment(&self, bytes: &[u8]) -> bool {
-        let ptr = bytes.as_ptr() as *const c_void;
-        let align = self.alignment().into();
-        unsafe {
-            patomic_align_meets_recommended(ptr, align) != 0
-                || patomic_align_meets_minimum(ptr, align, bytes.len()) != 0
-        }
     }
 }
