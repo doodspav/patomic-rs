@@ -114,4 +114,20 @@ pub trait ImplicitOps: AtomicLayout {
             ) != 0
         })
     }
+
+    fn bit_test(obj: &[u8], offset: usize) -> Result<bool> {
+        todo!()
+    }
+
+    fn bit_test_compl(obj: &mut [u8], offset: usize) -> Result<bool> {
+        todo!()
+    }
+
+    fn bit_test_set(obj: &mut [u8], offset: usize) -> Result<bool> {
+        todo!()
+    }
+
+    fn bit_test_reset(obj: &mut [u8], offset: usize) -> Result<bool> {
+        todo!()
+    }
 }
