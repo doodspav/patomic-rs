@@ -234,4 +234,127 @@ pub trait ImplicitOps: AtomicLayout {
             )
         })
     }
+
+    fn add(obj: &mut [u8], arg: &[u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().arithmetic_ops, fp_add,
+            obj, arg,
+        );
+        Ok(unsafe {
+            fp_add(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+            )
+        })
+    }
+
+    fn sub(obj: &mut [u8], arg: &[u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().arithmetic_ops, fp_sub,
+            obj, arg,
+        );
+        Ok(unsafe {
+            fp_sub(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+            )
+        })
+    }
+
+    fn inc(obj: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().arithmetic_ops, fp_inc,
+            obj,
+        );
+        Ok(unsafe {
+            fp_inc(obj.as_mut_ptr() as *mut c_void)
+        })
+    }
+
+    fn dec(obj: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().arithmetic_ops, fp_dec,
+            obj,
+        );
+        Ok(unsafe {
+            fp_dec(obj.as_mut_ptr() as *mut c_void)
+        })
+    }
+
+    fn neg(obj: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().arithmetic_ops, fp_neg,
+            obj,
+        );
+        Ok(unsafe {
+            fp_neg(obj.as_mut_ptr() as *mut c_void)
+        })
+    }
+
+    fn fetch_add(obj: &mut [u8], arg: &[u8], ret: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().arithmetic_ops, fp_fetch_add,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_add(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
+    }
+
+    fn fetch_sub(obj: &mut [u8], arg: &[u8], ret: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().arithmetic_ops, fp_fetch_sub,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_sub(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
+    }
+
+    fn fetch_inc(obj: &mut [u8], ret: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().arithmetic_ops, fp_fetch_inc,
+            obj, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_inc(
+                obj.as_mut_ptr() as *mut c_void,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
+    }
+
+    fn fetch_dec(obj: &mut [u8], ret: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().arithmetic_ops, fp_fetch_dec,
+            obj, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_dec(
+                obj.as_mut_ptr() as *mut c_void,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
+    }
+
+    fn fetch_neg(obj: &mut [u8], ret: &mut [u8]) -> Result<()> {
+        do_implicit_checks!(
+            Self::ffi_ops().arithmetic_ops, fp_fetch_neg,
+            obj, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_neg(
+                obj.as_mut_ptr() as *mut c_void,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
+    }
 }
