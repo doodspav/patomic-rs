@@ -1,15 +1,15 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use core::fmt::Display;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Error {
     InvalidAlignment,
     InvalidSize,
 }
 
-impl Display for Error {
+pub type Result<T> = core::result::Result<T, Error>;
+
+impl core::fmt::Display for Error {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidAlignment => write!(f, "invalid alignment"),
