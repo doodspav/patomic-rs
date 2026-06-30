@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 mod align;
+mod error;
 mod ops;
 
 use align::*;
+use error::*;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
