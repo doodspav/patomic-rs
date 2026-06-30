@@ -6,6 +6,11 @@ use core::ffi::c_void;
 
 use patomic_sys::*;
 
+pub trait AtomicLayout {
+    fn size() -> usize;
+    fn alignment() -> Alignment;
+}
+
 #[derive(Debug, Copy, Clone)]
 pub struct Alignment {
     pub recommended: usize,
