@@ -3,8 +3,11 @@
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Error {
-    InvalidAlignment,
     InvalidSize,
+    InvalidAlignment,
+    InvalidMemoryOrder,
+    InvalidFailOrder,
+    UnsupportedOperation,
 }
 
 pub type Result<T> = core::result::Result<T, Error>;
@@ -12,8 +15,11 @@ pub type Result<T> = core::result::Result<T, Error>;
 impl core::fmt::Display for Error {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            Self::InvalidAlignment => write!(f, "invalid alignment"),
             Self::InvalidSize => write!(f, "invalid size"),
+            Self::InvalidAlignment => write!(f, "invalid alignment"),
+            Self::InvalidMemoryOrder => write!(f, "invalid memory order"),
+            Self::InvalidFailOrder => write!(f, "invalid fail order"),
+            Self::UnsupportedOperation => write!(f, "unsupported operation"),
         }
     }
 }
