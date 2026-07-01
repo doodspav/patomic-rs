@@ -3,10 +3,12 @@
 
 mod align;
 mod error;
-mod ops;
+pub mod ops;
+mod shared_bytes;
 
 use align::*;
 use error::*;
+use shared_bytes::*;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
