@@ -5,7 +5,7 @@ use core::ffi::{c_int, c_void};
 
 use patomic_sys::*;
 
-use crate::{AtomicLayout, Error, Ordering, Result, SharedBytesRef};
+use crate::{AtomicError, AtomicLayout, AtomicResult, Ordering, SharedBytesRef};
 
 use crate::ops::macros::{
     do_atomic_checks,
@@ -17,13 +17,13 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn store_explicit(
         obj: SharedBytesRef, ordering: Ordering, desired: &[u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops(), fp_store,
             obj, desired,
         );
         if !ordering.is_valid_store_ordering() {
-            return Err(Error::InvalidOrdering)
+            return Err(AtomicError::InvalidOrdering)
         };
         Ok(unsafe {
             fp_store(
@@ -36,13 +36,13 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn load_explicit(
         obj: SharedBytesRef, ordering: Ordering, ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops(), fp_load,
             obj, ret,
         );
         if !ordering.is_valid_load_ordering() {
-            return Err(Error::InvalidOrdering)
+            return Err(AtomicError::InvalidOrdering)
         };
         Ok(unsafe {
             fp_load(
@@ -55,7 +55,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn exchange_explicit(
         obj: SharedBytesRef, desired: &[u8], ordering: Ordering, ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().xchg_ops, fp_exchange,
             obj, desired, ret,
@@ -73,13 +73,13 @@ pub trait ExplicitOps: AtomicLayout {
     fn compare_exchange_weak_explicit(
         obj: SharedBytesRef, expected: &mut [u8], desired: &[u8],
         succ: Ordering, fail: Ordering
-    ) -> Result<bool> {
+    ) -> AtomicResult<bool> {
         do_atomic_checks!(
             Self::ffi_ops().xchg_ops, fp_cmpxchg_weak,
             obj, desired, expected,
         );
         if !fail.is_valid_fail_ordering_for(succ) {
-            return Err(Error::InvalidFailOrdering)
+            return Err(AtomicError::InvalidFailOrdering)
         };
         Ok(unsafe {
             fp_cmpxchg_weak(
@@ -95,13 +95,13 @@ pub trait ExplicitOps: AtomicLayout {
     fn compare_exchange_strong_explicit(
         obj: SharedBytesRef, expected: &mut [u8], desired: &[u8],
         succ: Ordering, fail: Ordering
-    ) -> Result<bool> {
+    ) -> AtomicResult<bool> {
         do_atomic_checks!(
             Self::ffi_ops().xchg_ops, fp_cmpxchg_strong,
             obj, desired, expected,
         );
         if !fail.is_valid_fail_ordering_for(succ) {
-            return Err(Error::InvalidFailOrdering)
+            return Err(AtomicError::InvalidFailOrdering)
         };
         Ok(unsafe {
             fp_cmpxchg_strong(
@@ -116,13 +116,13 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn bit_test_explicit(
         obj: SharedBytesRef, offset: usize, ordering: Ordering
-    ) -> Result<bool> {
+    ) -> AtomicResult<bool> {
         do_atomic_checks_bit_test!(
             Self::ffi_ops().bitwise_ops, fp_test,
             obj; offset
         );
         if !ordering.is_valid_load_ordering() {
-            return Err(Error::InvalidOrdering)
+            return Err(AtomicError::InvalidOrdering)
         };
         Ok(unsafe {
             fp_test(
@@ -135,7 +135,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn bit_test_compl_explicit(
         obj: SharedBytesRef, offset: usize, ordering: Ordering
-    ) -> Result<bool> {
+    ) -> AtomicResult<bool> {
         do_atomic_checks_bit_test!(
             Self::ffi_ops().bitwise_ops, fp_test_compl,
             obj; offset
@@ -151,7 +151,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn bit_test_set_explicit(
         obj: SharedBytesRef, offset: usize, ordering: Ordering
-    ) -> Result<bool> {
+    ) -> AtomicResult<bool> {
         do_atomic_checks_bit_test!(
             Self::ffi_ops().bitwise_ops, fp_test_set,
             obj; offset
@@ -167,7 +167,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn bit_test_reset_explicit(
         obj: SharedBytesRef, offset: usize, ordering: Ordering
-    ) -> Result<bool> {
+    ) -> AtomicResult<bool> {
         do_atomic_checks_bit_test!(
             Self::ffi_ops().bitwise_ops, fp_test_reset,
             obj; offset
@@ -183,7 +183,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn or_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_or,
             obj, arg,
@@ -199,7 +199,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn xor_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_xor,
             obj, arg,
@@ -215,7 +215,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn and_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_and,
             obj, arg,
@@ -229,7 +229,7 @@ pub trait ExplicitOps: AtomicLayout {
         })
     }
 
-    fn not_explicit(obj: SharedBytesRef, ordering: Ordering) -> Result<()> {
+    fn not_explicit(obj: SharedBytesRef, ordering: Ordering) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_not,
             obj,
@@ -244,7 +244,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn fetch_or_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering, ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_fetch_or,
             obj, arg, ret,
@@ -261,7 +261,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn fetch_xor_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering, ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_fetch_xor,
             obj, arg, ret,
@@ -278,7 +278,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn fetch_and_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering, ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_fetch_and,
             obj, arg, ret,
@@ -295,7 +295,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn fetch_not_explicit(
         obj: SharedBytesRef, ordering: Ordering, ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_fetch_not,
             obj, ret,
@@ -311,7 +311,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn add_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_add,
             obj, arg,
@@ -327,7 +327,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn sub_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_sub,
             obj, arg,
@@ -341,7 +341,7 @@ pub trait ExplicitOps: AtomicLayout {
         })
     }
 
-    fn inc_explicit(obj: SharedBytesRef, ordering: Ordering) -> Result<()> {
+    fn inc_explicit(obj: SharedBytesRef, ordering: Ordering) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_inc,
             obj,
@@ -354,7 +354,7 @@ pub trait ExplicitOps: AtomicLayout {
         })
     }
 
-    fn dec_explicit(obj: SharedBytesRef, ordering: Ordering) -> Result<()> {
+    fn dec_explicit(obj: SharedBytesRef, ordering: Ordering) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_dec,
             obj,
@@ -367,7 +367,7 @@ pub trait ExplicitOps: AtomicLayout {
         })
     }
 
-    fn neg_explicit(obj: SharedBytesRef, ordering: Ordering) -> Result<()> {
+    fn neg_explicit(obj: SharedBytesRef, ordering: Ordering) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_neg,
             obj,
@@ -382,7 +382,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn fetch_add_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering, ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_fetch_add,
             obj, arg, ret,
@@ -399,7 +399,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn fetch_sub_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering, ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_fetch_sub,
             obj, arg, ret,
@@ -416,7 +416,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn fetch_inc_explicit(
         obj: SharedBytesRef, ordering: Ordering, ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_fetch_inc,
             obj, ret,
@@ -432,7 +432,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn fetch_dec_explicit(
         obj: SharedBytesRef, ordering: Ordering, ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_fetch_dec,
             obj, ret,
@@ -448,7 +448,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn fetch_neg_explicit(
         obj: SharedBytesRef, ordering: Ordering, ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_fetch_neg,
             obj, ret,

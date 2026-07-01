@@ -5,7 +5,7 @@ use core::ffi::{c_int, c_void};
 
 use patomic_sys::*;
 
-use crate::{AtomicLayout, Error, Result, SharedBytesRef};
+use crate::{AtomicError, AtomicLayout, AtomicResult, SharedBytesRef};
 
 use crate::ops::macros::{
     do_atomic_checks,
@@ -15,7 +15,7 @@ use crate::ops::macros::{
 pub trait ImplicitOps: AtomicLayout {
     fn ffi_ops() -> patomic_ops_t;
 
-    fn store(obj: SharedBytesRef, desired: &[u8]) -> Result<()> {
+    fn store(obj: SharedBytesRef, desired: &[u8]) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops(), fp_store,
             obj, desired,
@@ -28,7 +28,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn load(obj: SharedBytesRef, ret: &mut [u8]) -> Result<()> {
+    fn load(obj: SharedBytesRef, ret: &mut [u8]) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops(), fp_load,
             obj, ret,
@@ -43,7 +43,7 @@ pub trait ImplicitOps: AtomicLayout {
 
     fn exchange(
         obj: SharedBytesRef, desired: &[u8], ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().xchg_ops, fp_exchange,
             obj, desired, ret,
@@ -59,7 +59,7 @@ pub trait ImplicitOps: AtomicLayout {
 
     fn compare_exchange_weak(
         obj: SharedBytesRef, expected: &mut [u8], desired: &[u8]
-    ) -> Result<bool> {
+    ) -> AtomicResult<bool> {
         do_atomic_checks!(
             Self::ffi_ops().xchg_ops, fp_cmpxchg_weak,
             obj, desired, expected,
@@ -75,7 +75,7 @@ pub trait ImplicitOps: AtomicLayout {
 
     fn compare_exchange_strong(
         obj: SharedBytesRef, expected: &mut [u8], desired: &[u8]
-    ) -> Result<bool> {
+    ) -> AtomicResult<bool> {
         do_atomic_checks!(
             Self::ffi_ops().xchg_ops, fp_cmpxchg_strong,
             obj, desired, expected,
@@ -89,7 +89,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn bit_test(obj: SharedBytesRef, offset: usize) -> Result<bool> {
+    fn bit_test(obj: SharedBytesRef, offset: usize) -> AtomicResult<bool> {
         do_atomic_checks_bit_test!(
             Self::ffi_ops().bitwise_ops, fp_test,
             obj; offset
@@ -102,7 +102,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn bit_test_compl(obj: SharedBytesRef, offset: usize) -> Result<bool> {
+    fn bit_test_compl(obj: SharedBytesRef, offset: usize) -> AtomicResult<bool> {
         do_atomic_checks_bit_test!(
             Self::ffi_ops().bitwise_ops, fp_test_compl,
             obj; offset
@@ -115,7 +115,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn bit_test_set(obj: SharedBytesRef, offset: usize) -> Result<bool> {
+    fn bit_test_set(obj: SharedBytesRef, offset: usize) -> AtomicResult<bool> {
         do_atomic_checks_bit_test!(
             Self::ffi_ops().bitwise_ops, fp_test_set,
             obj; offset
@@ -128,7 +128,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn bit_test_reset(obj: SharedBytesRef, offset: usize) -> Result<bool> {
+    fn bit_test_reset(obj: SharedBytesRef, offset: usize) -> AtomicResult<bool> {
         do_atomic_checks_bit_test!(
             Self::ffi_ops().bitwise_ops, fp_test_reset,
             obj; offset
@@ -141,7 +141,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn or(obj: SharedBytesRef, arg: &[u8]) -> Result<()> {
+    fn or(obj: SharedBytesRef, arg: &[u8]) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_or,
             obj, arg,
@@ -154,7 +154,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn xor(obj: SharedBytesRef, arg: &[u8]) -> Result<()> {
+    fn xor(obj: SharedBytesRef, arg: &[u8]) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_xor,
             obj, arg,
@@ -167,7 +167,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn and(obj: SharedBytesRef, arg: &[u8]) -> Result<()> {
+    fn and(obj: SharedBytesRef, arg: &[u8]) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_and,
             obj, arg,
@@ -180,7 +180,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn not(obj: SharedBytesRef) -> Result<()> {
+    fn not(obj: SharedBytesRef) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_not,
             obj,
@@ -192,7 +192,7 @@ pub trait ImplicitOps: AtomicLayout {
 
     fn fetch_or(
         obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_fetch_or,
             obj, arg, ret,
@@ -208,7 +208,7 @@ pub trait ImplicitOps: AtomicLayout {
 
     fn fetch_xor(
         obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_fetch_xor,
             obj, arg, ret,
@@ -224,7 +224,7 @@ pub trait ImplicitOps: AtomicLayout {
 
     fn fetch_and(
         obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_fetch_and,
             obj, arg, ret,
@@ -238,7 +238,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn fetch_not(obj: SharedBytesRef, ret: &mut [u8]) -> Result<()> {
+    fn fetch_not(obj: SharedBytesRef, ret: &mut [u8]) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_fetch_not,
             obj, ret,
@@ -251,7 +251,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn add(obj: SharedBytesRef, arg: &[u8]) -> Result<()> {
+    fn add(obj: SharedBytesRef, arg: &[u8]) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_add,
             obj, arg,
@@ -264,7 +264,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn sub(obj: SharedBytesRef, arg: &[u8]) -> Result<()> {
+    fn sub(obj: SharedBytesRef, arg: &[u8]) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_sub,
             obj, arg,
@@ -277,7 +277,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn inc(obj: SharedBytesRef) -> Result<()> {
+    fn inc(obj: SharedBytesRef) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_inc,
             obj,
@@ -287,7 +287,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn dec(obj: SharedBytesRef) -> Result<()> {
+    fn dec(obj: SharedBytesRef) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_dec,
             obj,
@@ -297,7 +297,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn neg(obj: SharedBytesRef) -> Result<()> {
+    fn neg(obj: SharedBytesRef) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_neg,
             obj,
@@ -309,7 +309,7 @@ pub trait ImplicitOps: AtomicLayout {
 
     fn fetch_add(
         obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_fetch_add,
             obj, arg, ret,
@@ -325,7 +325,7 @@ pub trait ImplicitOps: AtomicLayout {
 
     fn fetch_sub(
         obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
-    ) -> Result<()> {
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_fetch_sub,
             obj, arg, ret,
@@ -339,7 +339,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn fetch_inc(obj: SharedBytesRef, ret: &mut [u8]) -> Result<()> {
+    fn fetch_inc(obj: SharedBytesRef, ret: &mut [u8]) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_fetch_inc,
             obj, ret,
@@ -352,7 +352,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn fetch_dec(obj: SharedBytesRef, ret: &mut [u8]) -> Result<()> {
+    fn fetch_dec(obj: SharedBytesRef, ret: &mut [u8]) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_fetch_dec,
             obj, ret,
@@ -365,7 +365,7 @@ pub trait ImplicitOps: AtomicLayout {
         })
     }
 
-    fn fetch_neg(obj: SharedBytesRef, ret: &mut [u8]) -> Result<()> {
+    fn fetch_neg(obj: SharedBytesRef, ret: &mut [u8]) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_fetch_neg,
             obj, ret,

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Error {
+pub enum AtomicError {
     InvalidSize,
     InvalidAlignment,
     InvalidOffset,
@@ -11,9 +11,9 @@ pub enum Error {
     UnsupportedOperation,
 }
 
-pub type Result<T> = core::result::Result<T, Error>;
+pub type AtomicResult<T> = Result<T, AtomicError>;
 
-impl core::fmt::Display for Error {
+impl core::fmt::Display for AtomicError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidSize => write!(f, "invalid size"),
@@ -26,4 +26,4 @@ impl core::fmt::Display for Error {
     }
 }
 
-impl core::error::Error for Error {}
+impl core::error::Error for AtomicError {}
