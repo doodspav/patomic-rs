@@ -5,9 +5,7 @@ use core::ffi::{c_int, c_void};
 
 use patomic_sys::*;
 
-use crate::SharedBytesRef;
-use crate::align::AtomicLayout;
-use crate::error::{Error, Result};
+use crate::{AtomicLayout, Error, Result, SharedBytesRef};
 
 use crate::ops::macros::{
     do_atomic_checks,
