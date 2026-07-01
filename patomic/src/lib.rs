@@ -5,12 +5,14 @@ mod align;
 mod error;
 mod ordering;
 pub mod ops;
-mod shared_bytes;
+mod shared;
+mod transaction;
 
 pub use align::*;
 pub use error::*;
 pub use ordering::*;
-pub use shared_bytes::*;
+pub use shared::*;
+pub use transaction::*;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
