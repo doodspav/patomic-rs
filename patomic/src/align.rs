@@ -14,7 +14,7 @@ pub trait AtomicLayout {
     fn alignment() -> Alignment;
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub struct Alignment {
     pub recommended: NonZeroUsize,
     pub minimum: NonZeroUsize,
