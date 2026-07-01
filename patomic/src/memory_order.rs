@@ -18,13 +18,22 @@ pub enum Ordering {
 }
 
 impl Ordering {
-    fn fail_ordering(&self) -> Ordering {
-        PATOMIC_CMPXCHG_FAIL_ORDER((*self) as c_int).into()
+    pub const fn is_valid_store_ordering(&self) -> bool {
+        PATOMIC_IS_VALID_STORE_ORDER((*self) as c_int)
     }
-    const fn is_valid_fail_for(&self, succ: Ordering) -> bool {
+
+    pub const fn is_valid_load_ordering(&self) -> bool {
+        PATOMIC_IS_VALID_LOAD_ORDER((*self) as c_int)
+    }
+
+    pub const fn is_valid_fail_ordering_for(&self, succ: Ordering) -> bool {
         PATOMIC_IS_VALID_FAIL_ORDER(
             succ as c_int, (*self) as c_int,
         )
+    }
+
+    pub fn fail_ordering(&self) -> Ordering {
+        PATOMIC_CMPXCHG_FAIL_ORDER((*self) as c_int).into()
     }
 }
 

@@ -14,6 +14,7 @@ pub struct patomic_align_t {
     pub size_within: usize,
 }
 
+// todo: add tests
 #[inline]
 pub fn PATOMIC_ALIGN_MEETS_RECOMMENDED(
     ptr: *const c_void,
@@ -27,6 +28,7 @@ pub fn PATOMIC_ALIGN_MEETS_RECOMMENDED(
     addr & (recommended - 1) == 0
 }
 
+// todo: add tests
 #[inline]
 pub fn PATOMIC_ALIGN_MEETS_MINIMUM(
     ptr: *const c_void,
