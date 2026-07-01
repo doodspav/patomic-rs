@@ -3,9 +3,11 @@
 
 mod unchecked_implicit;
 mod unchecked_explicit;
+mod unchecked_transaction;
 
 pub use unchecked_implicit::*;
 pub use unchecked_explicit::*;
+pub use unchecked_transaction::*;
 
 mod macros;
 
