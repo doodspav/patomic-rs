@@ -16,13 +16,6 @@ impl<'a> SharedBytesRef<'a> {
         Self { bytes }
     }
 
-    pub unsafe fn from_raw(bytes: &'a [u8]) -> Self {
-        let ptr = bytes as *const [u8] as *const [UnsafeCell<u8>];
-        Self {
-            bytes: unsafe { &*ptr },
-        }
-    }
-
     pub fn len(&self) -> usize {
         self.bytes.len()
     }
