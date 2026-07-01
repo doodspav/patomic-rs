@@ -111,4 +111,71 @@ pub trait ExplicitOps: AtomicLayout {
             ) != 0
         })
     }
+
+    fn bit_test_explicit(
+        obj: SharedBytesRef, offset: usize, ordering: Ordering
+    ) -> Result<bool> {
+        do_atomic_checks_bit_test!(
+            Self::ffi_ops().bitwise_ops, fp_test,
+            obj; offset
+        );
+        if !ordering.is_valid_load_ordering() {
+            return Err(Error::InvalidOrdering)
+        };
+        Ok(unsafe {
+            fp_test(
+                obj.as_ptr() as *const c_void,
+                offset as c_int,
+                ordering as c_int,
+            ) != 0
+        })
+    }
+
+    fn bit_test_compl_explicit(
+        obj: SharedBytesRef, offset: usize, ordering: Ordering
+    ) -> Result<bool> {
+        do_atomic_checks_bit_test!(
+            Self::ffi_ops().bitwise_ops, fp_test_compl,
+            obj; offset
+        );
+        Ok(unsafe {
+            fp_test_compl(
+                obj.as_mut_ptr() as *mut c_void,
+                offset as c_int,
+                ordering as c_int,
+            ) != 0
+        })
+    }
+
+    fn bit_test_set_explicit(
+        obj: SharedBytesRef, offset: usize, ordering: Ordering
+    ) -> Result<bool> {
+        do_atomic_checks_bit_test!(
+            Self::ffi_ops().bitwise_ops, fp_test_set,
+            obj; offset
+        );
+        Ok(unsafe {
+            fp_test_set(
+                obj.as_mut_ptr() as *mut c_void,
+                offset as c_int,
+                ordering as c_int,
+            ) != 0
+        })
+    }
+
+    fn bit_test_reset_explicit(
+        obj: SharedBytesRef, offset: usize, ordering: Ordering
+    ) -> Result<bool> {
+        do_atomic_checks_bit_test!(
+            Self::ffi_ops().bitwise_ops, fp_test_reset,
+            obj; offset
+        );
+        Ok(unsafe {
+            fp_test_reset(
+                obj.as_mut_ptr() as *mut c_void,
+                offset as c_int,
+                ordering as c_int,
+            ) != 0
+        })
+    }
 }
