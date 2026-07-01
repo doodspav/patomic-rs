@@ -25,7 +25,7 @@ impl<'a> SharedBytesRef<'a> {
     }
 
     pub fn as_ptr(&self) -> *const u8 {
-        self.bytes.as_ptr().cast()
+        self.bytes.as_ptr() as *const u8
     }
 
     pub fn as_mut_ptr(&self) -> *mut u8 {

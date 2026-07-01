@@ -7,6 +7,8 @@ use core::num::NonZeroUsize;
 
 use patomic_sys::*;
 
+use crate::SharedBytesRef;
+
 pub trait AtomicLayout {
     fn width() -> NonZeroUsize;
     fn alignment() -> Alignment;
@@ -20,7 +22,7 @@ pub struct Alignment {
 }
 
 impl Alignment {
-    pub fn is_met_by(&self, bytes: &[u8]) -> bool {
+    pub fn is_met_by(&self, bytes: SharedBytesRef) -> bool {
         let ptr = bytes.as_ptr() as *const c_void;
         let align = (*self).into();
         let Some(width) = NonZeroUsize::new(bytes.len()) else {
