@@ -3,13 +3,13 @@
 
 mod align;
 mod error;
-mod memory_order;
+mod ordering;
 pub mod ops;
 mod shared_bytes;
 
 pub use align::*;
 pub use error::*;
-pub use memory_order::*;
+pub use ordering::*;
 pub use shared_bytes::*;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
