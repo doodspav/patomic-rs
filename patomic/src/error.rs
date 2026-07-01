@@ -7,7 +7,6 @@ pub enum AtomicError {
     InvalidAlignment,
     InvalidOffset,
     InvalidOrdering,
-    InvalidFailOrdering,
     UnsupportedOperation,
 }
 
@@ -20,7 +19,6 @@ impl core::fmt::Display for AtomicError {
             Self::InvalidAlignment => write!(f, "invalid alignment"),
             Self::InvalidOffset => write!(f, "invalid offset"),
             Self::InvalidOrdering => write!(f, "invalid ordering"),
-            Self::InvalidFailOrdering => write!(f, "invalid fail ordering"),
             Self::UnsupportedOperation => write!(f, "unsupported operation"),
         }
     }

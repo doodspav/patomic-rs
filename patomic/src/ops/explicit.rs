@@ -79,7 +79,7 @@ pub trait ExplicitOps: AtomicLayout {
             obj, desired, expected,
         );
         if !fail.is_valid_fail_ordering_for(succ) {
-            return Err(AtomicError::InvalidFailOrdering)
+            return Err(AtomicError::InvalidOrdering)
         };
         Ok(unsafe {
             fp_cmpxchg_weak(
@@ -101,7 +101,7 @@ pub trait ExplicitOps: AtomicLayout {
             obj, desired, expected,
         );
         if !fail.is_valid_fail_ordering_for(succ) {
-            return Err(AtomicError::InvalidFailOrdering)
+            return Err(AtomicError::InvalidOrdering)
         };
         Ok(unsafe {
             fp_cmpxchg_strong(
