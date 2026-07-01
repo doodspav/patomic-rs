@@ -4,6 +4,5 @@
 use patomic_sys::*;
 
 pub trait TransactionOps {
-
     fn ffi_ops() -> patomic_ops_transaction_t;
 }

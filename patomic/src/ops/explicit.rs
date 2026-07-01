@@ -16,7 +16,6 @@ use crate::ops::macros::{
 };
 
 pub trait ExplicitOps: AtomicLayout {
-
     fn ffi_ops() -> patomic_ops_explicit_t;
 
     fn store_explicit(
@@ -176,6 +175,134 @@ pub trait ExplicitOps: AtomicLayout {
                 offset as c_int,
                 ordering as c_int,
             ) != 0
+        })
+    }
+
+    fn or_explicit(
+        obj: SharedBytesRef, arg: &[u8], ordering: Ordering
+    ) -> Result<()> {
+        do_atomic_checks!(
+            Self::ffi_ops().binary_ops, fp_or,
+            obj, arg,
+        );
+        Ok(unsafe {
+            fp_or(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+                ordering as c_int,
+            )
+        })
+    }
+
+    fn xor_explicit(
+        obj: SharedBytesRef, arg: &[u8], ordering: Ordering
+    ) -> Result<()> {
+        do_atomic_checks!(
+            Self::ffi_ops().binary_ops, fp_xor,
+            obj, arg,
+        );
+        Ok(unsafe {
+            fp_xor(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+                ordering as c_int,
+            )
+        })
+    }
+
+    fn and_explicit(
+        obj: SharedBytesRef, arg: &[u8], ordering: Ordering
+    ) -> Result<()> {
+        do_atomic_checks!(
+            Self::ffi_ops().binary_ops, fp_and,
+            obj, arg,
+        );
+        Ok(unsafe {
+            fp_and(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+                ordering as c_int,
+            )
+        })
+    }
+
+    fn not_explicit(obj: SharedBytesRef, ordering: Ordering) -> Result<()> {
+        do_atomic_checks!(
+            Self::ffi_ops().binary_ops, fp_not,
+            obj,
+        );
+        Ok(unsafe {
+            fp_not(
+                obj.as_mut_ptr() as *mut c_void,
+                ordering as c_int,
+            )
+        })
+    }
+
+    fn fetch_or(
+        obj: SharedBytesRef, arg: &[u8], ordering: Ordering, ret: &mut [u8]
+    ) -> Result<()> {
+        do_atomic_checks!(
+            Self::ffi_ops().binary_ops, fp_fetch_or,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_or(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+                ordering as c_int,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
+    }
+
+    fn fetch_xor(
+        obj: SharedBytesRef, arg: &[u8], ordering: Ordering, ret: &mut [u8]
+    ) -> Result<()> {
+        do_atomic_checks!(
+            Self::ffi_ops().binary_ops, fp_fetch_xor,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_xor(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+                ordering as c_int,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
+    }
+
+    fn fetch_and(
+        obj: SharedBytesRef, arg: &[u8], ordering: Ordering, ret: &mut [u8]
+    ) -> Result<()> {
+        do_atomic_checks!(
+            Self::ffi_ops().binary_ops, fp_fetch_and,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_and(
+                obj.as_mut_ptr() as *mut c_void,
+                arg.as_ptr() as *const c_void,
+                ordering as c_int,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
+    }
+
+    fn fetch_not(
+        obj: SharedBytesRef, ordering: Ordering, ret: &mut [u8]
+    ) -> Result<()> {
+        do_atomic_checks!(
+            Self::ffi_ops().binary_ops, fp_fetch_not,
+            obj, ret,
+        );
+        Ok(unsafe {
+            fp_fetch_not(
+                obj.as_mut_ptr() as *mut c_void,
+                ordering as c_int,
+                ret.as_mut_ptr() as *mut c_void,
+            )
         })
     }
 }
