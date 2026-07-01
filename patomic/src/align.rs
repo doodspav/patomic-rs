@@ -14,7 +14,7 @@ pub trait AtomicLayout {
     fn alignment() -> Alignment;
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Alignment {
     pub recommended: NonZeroUsize,
     pub minimum: NonZeroUsize,
@@ -52,16 +52,6 @@ impl From<Alignment> for patomic_align_t {
         }
     }
 }
-
-impl PartialEq for Alignment {
-    fn eq(&self, other: &Self) -> bool {
-        self.recommended == other.recommended
-            && self.minimum == other.minimum
-            && self.size_within == other.size_within
-    }
-}
-
-impl Eq for Alignment {}
 
 impl Ord for Alignment {
     fn cmp(&self, other: &Self) -> Ordering {
