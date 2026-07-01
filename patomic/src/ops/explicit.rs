@@ -56,4 +56,59 @@ pub trait ExplicitOps: AtomicLayout {
             )
         })
     }
+
+    fn exchange_explicit(
+        obj: SharedBytesRef, desired: &[u8], ordering: Ordering, ret: &mut [u8]
+    ) -> Result<()> {
+        do_atomic_checks!(
+            Self::ffi_ops().xchg_ops, fp_exchange,
+            obj, desired, ret,
+        );
+        Ok(unsafe {
+            fp_exchange(
+                obj.as_mut_ptr() as *mut c_void,
+                desired.as_ptr() as *const c_void,
+                ordering as c_int,
+                ret.as_mut_ptr() as *mut c_void,
+            )
+        })
+    }
+
+    fn compare_exchange_weak_explicit(
+        obj: SharedBytesRef, expected: &mut [u8], desired: &[u8],
+        succ: Ordering, fail: Ordering
+    ) -> Result<bool> {
+        do_atomic_checks!(
+            Self::ffi_ops().xchg_ops, fp_cmpxchg_weak,
+            obj, desired, expected,
+        );
+        Ok(unsafe {
+            fp_cmpxchg_weak(
+                obj.as_mut_ptr() as *mut c_void,
+                expected.as_mut_ptr() as *mut c_void,
+                desired.as_ptr() as *const c_void,
+                succ as c_int,
+                fail as c_int,
+            ) != 0
+        })
+    }
+
+    fn compare_exchange_strong_explicit(
+        obj: SharedBytesRef, expected: &mut [u8], desired: &[u8],
+        succ: Ordering, fail: Ordering
+    ) -> Result<bool> {
+        do_atomic_checks!(
+            Self::ffi_ops().xchg_ops, fp_cmpxchg_strong,
+            obj, desired, expected,
+        );
+        Ok(unsafe {
+            fp_cmpxchg_strong(
+                obj.as_mut_ptr() as *mut c_void,
+                expected.as_mut_ptr() as *mut c_void,
+                desired.as_ptr() as *const c_void,
+                succ as c_int,
+                fail as c_int,
+            ) != 0
+        })
+    }
 }
