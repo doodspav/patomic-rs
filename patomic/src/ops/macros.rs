@@ -9,7 +9,7 @@ macro_rules! do_atomic_checks {
         $(, $bytes:ident)* $(,)?
     ) => {
         // check that operation is supported
-        let Some($fp) = $ops.$fp else {
+        if $ops.$fp.is_none() {
             return Err(AtomicError::UnsupportedOperation);
         };
 
