@@ -1,27 +1,65 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum AtomicError {
+macro_rules! widen_error {
+    ($from:ty => $to:ty { $($variant:ident),+ $(,)? }) => {
+        impl From<$from> for $to {
+            fn from(e: $from) -> Self {
+                match e {
+                    $(<$from>::$variant => Self::$variant,)+
+                }
+            }
+        }
+    };
+}
+
+// applies to most operations
+pub enum AtomicOpError {
+    UnsupportedOperation,
+    InvalidSize,
+    InvalidAlignment,
+}
+
+widen_error!(AtomicOpError => AtomicBitwiseOpError {
+    UnsupportedOperation, InvalidSize, InvalidAlignment,
+});
+
+widen_error!(AtomicOpError => AtomicExplicitAccessOpError {
+    UnsupportedOperation, InvalidSize, InvalidAlignment,
+});
+
+widen_error!(AtomicOpError => AtomicExplicitBitTestOpError {
+    UnsupportedOperation, InvalidSize, InvalidAlignment,
+});
+
+// applies to bitwise operations (that have an offset)
+pub enum AtomicBitwiseOpError {
+    UnsupportedOperation,
+    InvalidSize,
+    InvalidAlignment,
+    InvalidOffset,
+}
+
+widen_error!(AtomicBitwiseOpError => AtomicExplicitBitTestOpError {
+    UnsupportedOperation, InvalidSize, InvalidAlignment, InvalidOffset,
+});
+
+// applies to explicit operations that have special ordering
+// these are operations that only do load or store, not rmw
+// load, store, cmpxchg (because of fail)
+pub enum AtomicExplicitAccessOpError {
+    UnsupportedOperation,
+    InvalidSize,
+    InvalidAlignment,
+    InvalidOrdering,
+}
+
+// applies only to explicit bit test
+// has both special ordering (load) and offset
+pub enum AtomicExplicitBitTestOpError {
+    UnsupportedOperation,
     InvalidSize,
     InvalidAlignment,
     InvalidOffset,
     InvalidOrdering,
-    UnsupportedOperation,
 }
-
-pub type AtomicResult<T> = Result<T, AtomicError>;
-
-impl core::fmt::Display for AtomicError {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidSize => write!(f, "invalid size"),
-            Self::InvalidAlignment => write!(f, "invalid alignment"),
-            Self::InvalidOffset => write!(f, "invalid offset"),
-            Self::InvalidOrdering => write!(f, "invalid ordering"),
-            Self::UnsupportedOperation => write!(f, "unsupported operation"),
-        }
-    }
-}
-
-impl core::error::Error for AtomicError {}
