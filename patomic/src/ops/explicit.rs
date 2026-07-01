@@ -19,7 +19,7 @@ pub trait ExplicitOps: AtomicLayout {
 
     fn ffi_ops() -> patomic_ops_explicit_t;
 
-    fn store(
+    fn store_explicit(
         obj: SharedBytesRef, ordering: Ordering, desired: &[u8]
     ) -> Result<()> {
         do_atomic_checks!(
@@ -38,7 +38,7 @@ pub trait ExplicitOps: AtomicLayout {
         })
     }
 
-    fn load(
+    fn load_explicit(
         obj: SharedBytesRef, ordering: Ordering, ret: &mut [u8]
     ) -> Result<()> {
         do_atomic_checks!(
