@@ -1,20 +1,17 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use core::ffi::{c_int, c_void};
-
-use patomic_sys::*;
+use core::ffi::c_int;
 
 use crate::{AtomicError, AtomicLayout, AtomicResult, Ordering, SharedBytesRef};
 
+use crate::ops::UncheckedExplicitOps;
 use crate::ops::macros::{
     do_atomic_checks,
     do_atomic_checks_bit_test,
 };
 
-pub trait ExplicitOps: AtomicLayout {
-    fn ffi_ops() -> patomic_ops_explicit_t;
-
+pub trait ExplicitOps: AtomicLayout + UncheckedExplicitOps {
     fn store_explicit(
         obj: SharedBytesRef, ordering: Ordering, desired: &[u8]
     ) -> AtomicResult<()> {
@@ -25,13 +22,7 @@ pub trait ExplicitOps: AtomicLayout {
         if !ordering.is_valid_store_ordering() {
             return Err(AtomicError::InvalidOrdering)
         };
-        Ok(unsafe {
-            fp_store(
-                obj.as_mut_ptr() as *mut c_void,
-                desired.as_ptr() as *const c_void,
-                ordering as c_int,
-            )
-        })
+        Ok(unsafe { Self::unchecked_store_explicit(obj, ordering, &desired) })
     }
 
     fn load_explicit(
@@ -44,13 +35,7 @@ pub trait ExplicitOps: AtomicLayout {
         if !ordering.is_valid_load_ordering() {
             return Err(AtomicError::InvalidOrdering)
         };
-        Ok(unsafe {
-            fp_load(
-                obj.as_ptr() as *const c_void,
-                ordering as c_int,
-                ret.as_mut_ptr() as *mut c_void,
-            )
-        })
+        Ok(unsafe { Self::unchecked_load_explicit(obj, ordering, ret) })
     }
 
     fn exchange_explicit(
@@ -61,12 +46,7 @@ pub trait ExplicitOps: AtomicLayout {
             obj, desired, ret,
         );
         Ok(unsafe {
-            fp_exchange(
-                obj.as_mut_ptr() as *mut c_void,
-                desired.as_ptr() as *const c_void,
-                ordering as c_int,
-                ret.as_mut_ptr() as *mut c_void,
-            )
+            Self::unchecked_exchange_explicit(obj, desired, ordering, ret)
         })
     }
 
@@ -82,13 +62,9 @@ pub trait ExplicitOps: AtomicLayout {
             return Err(AtomicError::InvalidOrdering)
         };
         Ok(unsafe {
-            fp_cmpxchg_weak(
-                obj.as_mut_ptr() as *mut c_void,
-                expected.as_mut_ptr() as *mut c_void,
-                desired.as_ptr() as *const c_void,
-                succ as c_int,
-                fail as c_int,
-            ) != 0
+            Self::unchecked_compare_exchange_weak_explicit(
+                obj, expected, desired, succ, fail
+            )
         })
     }
 
@@ -104,13 +80,9 @@ pub trait ExplicitOps: AtomicLayout {
             return Err(AtomicError::InvalidOrdering)
         };
         Ok(unsafe {
-            fp_cmpxchg_strong(
-                obj.as_mut_ptr() as *mut c_void,
-                expected.as_mut_ptr() as *mut c_void,
-                desired.as_ptr() as *const c_void,
-                succ as c_int,
-                fail as c_int,
-            ) != 0
+            Self::unchecked_compare_exchange_strong_explicit(
+                obj, expected, desired, succ, fail
+            )
         })
     }
 
@@ -124,13 +96,7 @@ pub trait ExplicitOps: AtomicLayout {
         if !ordering.is_valid_load_ordering() {
             return Err(AtomicError::InvalidOrdering)
         };
-        Ok(unsafe {
-            fp_test(
-                obj.as_ptr() as *const c_void,
-                offset as c_int,
-                ordering as c_int,
-            ) != 0
-        })
+        Ok(unsafe { Self::unchecked_bit_test_explicit(obj, offset, ordering) })
     }
 
     fn bit_test_compl_explicit(
@@ -141,11 +107,7 @@ pub trait ExplicitOps: AtomicLayout {
             obj; offset
         );
         Ok(unsafe {
-            fp_test_compl(
-                obj.as_mut_ptr() as *mut c_void,
-                offset as c_int,
-                ordering as c_int,
-            ) != 0
+            Self::unchecked_bit_test_compl_explicit(obj, offset, ordering)
         })
     }
 
@@ -157,11 +119,7 @@ pub trait ExplicitOps: AtomicLayout {
             obj; offset
         );
         Ok(unsafe {
-            fp_test_set(
-                obj.as_mut_ptr() as *mut c_void,
-                offset as c_int,
-                ordering as c_int,
-            ) != 0
+            Self::unchecked_bit_test_set_explicit(obj, offset, ordering)
         })
     }
 
@@ -173,11 +131,7 @@ pub trait ExplicitOps: AtomicLayout {
             obj; offset
         );
         Ok(unsafe {
-            fp_test_reset(
-                obj.as_mut_ptr() as *mut c_void,
-                offset as c_int,
-                ordering as c_int,
-            ) != 0
+            Self::unchecked_bit_test_reset_explicit(obj, offset, ordering)
         })
     }
 
@@ -188,13 +142,7 @@ pub trait ExplicitOps: AtomicLayout {
             Self::ffi_ops().binary_ops, fp_or,
             obj, arg,
         );
-        Ok(unsafe {
-            fp_or(
-                obj.as_mut_ptr() as *mut c_void,
-                arg.as_ptr() as *const c_void,
-                ordering as c_int,
-            )
-        })
+        Ok(unsafe { Self::unchecked_or_explicit(obj, arg, ordering) })
     }
 
     fn xor_explicit(
@@ -204,13 +152,7 @@ pub trait ExplicitOps: AtomicLayout {
             Self::ffi_ops().binary_ops, fp_xor,
             obj, arg,
         );
-        Ok(unsafe {
-            fp_xor(
-                obj.as_mut_ptr() as *mut c_void,
-                arg.as_ptr() as *const c_void,
-                ordering as c_int,
-            )
-        })
+        Ok(unsafe { Self::unchecked_xor_explicit(obj, arg, ordering) })
     }
 
     fn and_explicit(
@@ -220,26 +162,17 @@ pub trait ExplicitOps: AtomicLayout {
             Self::ffi_ops().binary_ops, fp_and,
             obj, arg,
         );
-        Ok(unsafe {
-            fp_and(
-                obj.as_mut_ptr() as *mut c_void,
-                arg.as_ptr() as *const c_void,
-                ordering as c_int,
-            )
-        })
+        Ok(unsafe { Self::unchecked_and_explicit(obj, arg, ordering) })
     }
 
-    fn not_explicit(obj: SharedBytesRef, ordering: Ordering) -> AtomicResult<()> {
+    fn not_explicit(
+        obj: SharedBytesRef, ordering: Ordering
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().binary_ops, fp_not,
             obj,
         );
-        Ok(unsafe {
-            fp_not(
-                obj.as_mut_ptr() as *mut c_void,
-                ordering as c_int,
-            )
-        })
+        Ok(unsafe { Self::unchecked_not_explicit(obj, ordering) })
     }
 
     fn fetch_or_explicit(
@@ -250,12 +183,7 @@ pub trait ExplicitOps: AtomicLayout {
             obj, arg, ret,
         );
         Ok(unsafe {
-            fp_fetch_or(
-                obj.as_mut_ptr() as *mut c_void,
-                arg.as_ptr() as *const c_void,
-                ordering as c_int,
-                ret.as_mut_ptr() as *mut c_void,
-            )
+            Self::unchecked_fetch_or_explicit(obj, arg, ordering, ret)
         })
     }
 
@@ -267,12 +195,7 @@ pub trait ExplicitOps: AtomicLayout {
             obj, arg, ret,
         );
         Ok(unsafe {
-            fp_fetch_xor(
-                obj.as_mut_ptr() as *mut c_void,
-                arg.as_ptr() as *const c_void,
-                ordering as c_int,
-                ret.as_mut_ptr() as *mut c_void,
-            )
+            Self::unchecked_fetch_xor_explicit(obj, arg, ordering, ret)
         })
     }
 
@@ -284,12 +207,7 @@ pub trait ExplicitOps: AtomicLayout {
             obj, arg, ret,
         );
         Ok(unsafe {
-            fp_fetch_and(
-                obj.as_mut_ptr() as *mut c_void,
-                arg.as_ptr() as *const c_void,
-                ordering as c_int,
-                ret.as_mut_ptr() as *mut c_void,
-            )
+            Self::unchecked_fetch_and_explicit(obj, arg, ordering, ret)
         })
     }
 
@@ -300,13 +218,7 @@ pub trait ExplicitOps: AtomicLayout {
             Self::ffi_ops().binary_ops, fp_fetch_not,
             obj, ret,
         );
-        Ok(unsafe {
-            fp_fetch_not(
-                obj.as_mut_ptr() as *mut c_void,
-                ordering as c_int,
-                ret.as_mut_ptr() as *mut c_void,
-            )
-        })
+        Ok(unsafe { Self::unchecked_fetch_not_explicit(obj, ordering, ret) })
     }
 
     fn add_explicit(
@@ -316,13 +228,7 @@ pub trait ExplicitOps: AtomicLayout {
             Self::ffi_ops().arithmetic_ops, fp_add,
             obj, arg,
         );
-        Ok(unsafe {
-            fp_add(
-                obj.as_mut_ptr() as *mut c_void,
-                arg.as_ptr() as *const c_void,
-                ordering as c_int,
-            )
-        })
+        Ok(unsafe { Self::unchecked_add_explicit(obj, arg, ordering) })
     }
 
     fn sub_explicit(
@@ -332,52 +238,37 @@ pub trait ExplicitOps: AtomicLayout {
             Self::ffi_ops().arithmetic_ops, fp_sub,
             obj, arg,
         );
-        Ok(unsafe {
-            fp_sub(
-                obj.as_mut_ptr() as *mut c_void,
-                arg.as_ptr() as *const c_void,
-                ordering as c_int,
-            )
-        })
+        Ok(unsafe { Self::unchecked_sub_explicit(obj, arg, ordering) })
     }
 
-    fn inc_explicit(obj: SharedBytesRef, ordering: Ordering) -> AtomicResult<()> {
+    fn inc_explicit(
+        obj: SharedBytesRef, ordering: Ordering
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_inc,
             obj,
         );
-        Ok(unsafe {
-            fp_inc(
-                obj.as_mut_ptr() as *mut c_void,
-                ordering as c_int,
-            )
-        })
+        Ok(unsafe { Self::unchecked_inc_explicit(obj, ordering) })
     }
 
-    fn dec_explicit(obj: SharedBytesRef, ordering: Ordering) -> AtomicResult<()> {
+    fn dec_explicit(
+        obj: SharedBytesRef, ordering: Ordering
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_dec,
             obj,
         );
-        Ok(unsafe {
-            fp_dec(
-                obj.as_mut_ptr() as *mut c_void,
-                ordering as c_int,
-            )
-        })
+        Ok(unsafe { Self::unchecked_dec_explicit(obj, ordering) })
     }
 
-    fn neg_explicit(obj: SharedBytesRef, ordering: Ordering) -> AtomicResult<()> {
+    fn neg_explicit(
+        obj: SharedBytesRef, ordering: Ordering
+    ) -> AtomicResult<()> {
         do_atomic_checks!(
             Self::ffi_ops().arithmetic_ops, fp_neg,
             obj,
         );
-        Ok(unsafe {
-            fp_neg(
-                obj.as_mut_ptr() as *mut c_void,
-                ordering as c_int,
-            )
-        })
+        Ok(unsafe { Self::unchecked_neg_explicit(obj, ordering) })
     }
 
     fn fetch_add_explicit(
@@ -388,12 +279,7 @@ pub trait ExplicitOps: AtomicLayout {
             obj, arg, ret,
         );
         Ok(unsafe {
-            fp_fetch_add(
-                obj.as_mut_ptr() as *mut c_void,
-                arg.as_ptr() as *const c_void,
-                ordering as c_int,
-                ret.as_mut_ptr() as *mut c_void,
-            )
+            Self::unchecked_fetch_add_explicit(obj, arg, ordering, ret)
         })
     }
 
@@ -405,12 +291,7 @@ pub trait ExplicitOps: AtomicLayout {
             obj, arg, ret,
         );
         Ok(unsafe {
-            fp_fetch_sub(
-                obj.as_mut_ptr() as *mut c_void,
-                arg.as_ptr() as *const c_void,
-                ordering as c_int,
-                ret.as_mut_ptr() as *mut c_void,
-            )
+            Self::unchecked_fetch_sub_explicit(obj, arg, ordering, ret)
         })
     }
 
@@ -421,13 +302,7 @@ pub trait ExplicitOps: AtomicLayout {
             Self::ffi_ops().arithmetic_ops, fp_fetch_inc,
             obj, ret,
         );
-        Ok(unsafe {
-            fp_fetch_inc(
-                obj.as_mut_ptr() as *mut c_void,
-                ordering as c_int,
-                ret.as_mut_ptr() as *mut c_void,
-            )
-        })
+        Ok(unsafe { Self::unchecked_fetch_inc_explicit(obj, ordering, ret) })
     }
 
     fn fetch_dec_explicit(
@@ -437,13 +312,7 @@ pub trait ExplicitOps: AtomicLayout {
             Self::ffi_ops().arithmetic_ops, fp_fetch_dec,
             obj, ret,
         );
-        Ok(unsafe {
-            fp_fetch_dec(
-                obj.as_mut_ptr() as *mut c_void,
-                ordering as c_int,
-                ret.as_mut_ptr() as *mut c_void,
-            )
-        })
+        Ok(unsafe { Self::unchecked_fetch_dec_explicit(obj, ordering, ret) })
     }
 
     fn fetch_neg_explicit(
@@ -453,12 +322,6 @@ pub trait ExplicitOps: AtomicLayout {
             Self::ffi_ops().arithmetic_ops, fp_fetch_neg,
             obj, ret,
         );
-        Ok(unsafe {
-            fp_fetch_neg(
-                obj.as_mut_ptr() as *mut c_void,
-                ordering as c_int,
-                ret.as_mut_ptr() as *mut c_void,
-            )
-        })
+        Ok(unsafe { Self::unchecked_fetch_neg_explicit(obj, ordering, ret) })
     }
 }
