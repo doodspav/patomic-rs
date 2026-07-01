@@ -81,6 +81,9 @@ pub trait ExplicitOps: AtomicLayout {
             Self::ffi_ops().xchg_ops, fp_cmpxchg_weak,
             obj, desired, expected,
         );
+        if !fail.is_valid_fail_ordering_for(succ) {
+            return Err(Error::InvalidFailOrdering)
+        };
         Ok(unsafe {
             fp_cmpxchg_weak(
                 obj.as_mut_ptr() as *mut c_void,
@@ -100,6 +103,9 @@ pub trait ExplicitOps: AtomicLayout {
             Self::ffi_ops().xchg_ops, fp_cmpxchg_strong,
             obj, desired, expected,
         );
+        if !fail.is_valid_fail_ordering_for(succ) {
+            return Err(Error::InvalidFailOrdering)
+        };
         Ok(unsafe {
             fp_cmpxchg_strong(
                 obj.as_mut_ptr() as *mut c_void,
@@ -239,7 +245,7 @@ pub trait ExplicitOps: AtomicLayout {
         })
     }
 
-    fn fetch_or(
+    fn fetch_or_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering, ret: &mut [u8]
     ) -> Result<()> {
         do_atomic_checks!(
@@ -256,7 +262,7 @@ pub trait ExplicitOps: AtomicLayout {
         })
     }
 
-    fn fetch_xor(
+    fn fetch_xor_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering, ret: &mut [u8]
     ) -> Result<()> {
         do_atomic_checks!(
@@ -273,7 +279,7 @@ pub trait ExplicitOps: AtomicLayout {
         })
     }
 
-    fn fetch_and(
+    fn fetch_and_explicit(
         obj: SharedBytesRef, arg: &[u8], ordering: Ordering, ret: &mut [u8]
     ) -> Result<()> {
         do_atomic_checks!(
@@ -290,7 +296,7 @@ pub trait ExplicitOps: AtomicLayout {
         })
     }
 
-    fn fetch_not(
+    fn fetch_not_explicit(
         obj: SharedBytesRef, ordering: Ordering, ret: &mut [u8]
     ) -> Result<()> {
         do_atomic_checks!(
