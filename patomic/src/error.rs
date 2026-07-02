@@ -66,7 +66,7 @@ pub type AtomicResult<T> = Result<T, AtomicError>;
 
 define_error!(
     AtomicExplicitBitTestOpError => [
-        AtomicError
+        AtomicError,
     ] {
         UnsupportedOperation,
         InvalidSize,
@@ -81,7 +81,7 @@ pub type AtomicExplicitBitTestOpResult<T> =
 
 define_error!(
     AtomicExplicitAccessOpError => [
-        AtomicError
+        AtomicError,
     ] {
         UnsupportedOperation,
         InvalidSize,
@@ -96,7 +96,7 @@ pub type AtomicExplicitAccessOpResult<T> =
 define_error!(
     AtomicBitwiseOpError => [
         AtomicExplicitBitTestOpError,
-        AtomicError
+        AtomicError,
     ] {
         UnsupportedOperation,
         InvalidSize,
@@ -112,7 +112,7 @@ define_error!(
         AtomicBitwiseOpError,
         AtomicExplicitAccessOpError,
         AtomicExplicitBitTestOpError,
-        AtomicError
+        AtomicError,
     ] {
         UnsupportedOperation,
         InvalidSize,
@@ -121,3 +121,13 @@ define_error!(
 );
 
 pub type AtomicOpResult<T> = Result<T, AtomicOpError>;
+
+define_error!(
+    TransactionError {
+        UnsupportedOperation,
+        InvalidSize,
+        InvalidOffset,
+    }
+);
+
+pub type TransactionResult<T> = Result<T, TransactionError>;
