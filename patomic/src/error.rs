@@ -1,6 +1,15 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+#[allow(non_upper_case_globals)]
+mod messages {
+    pub const UnsupportedOperation: &str = "The operation is not supported by this backend on this platform";
+    pub const InvalidSize: &str = "The size of an object used by this operation does not match the expected width";
+    pub const InvalidAlignment: &str = "The alignment of the shared object is insufficient for this operation on this backend and platform";
+    pub const InvalidOffset: &str = "The offset used would exceed the bounds of the shared object";
+    pub const InvalidOrdering: &str = "The ordering used is not valid for this operation";
+}
+
 macro_rules! define_error {
     // Without conversions.
     ($name:ident $variants:tt) => {
@@ -41,15 +50,6 @@ macro_rules! define_error {
             }
         }
     };
-}
-
-#[allow(non_upper_case_globals)]
-mod messages {
-    pub const UnsupportedOperation: &str = "The operation is not supported by this backend on this platform";
-    pub const InvalidSize: &str = "The size of an object used by this operation does not match the expected width";
-    pub const InvalidAlignment: &str = "The alignment of the shared object is insufficient for this operation on this backend and platform";
-    pub const InvalidOffset: &str = "The offset used would exceed the bounds of the shared object";
-    pub const InvalidOrdering: &str = "The ordering used is not valid for this operation";
 }
 
 define_error!(
