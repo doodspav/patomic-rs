@@ -12,243 +12,251 @@ use crate::ops::macros::{
 };
 
 pub trait ImplicitOps: AtomicLayout + UncheckedImplicitOps {
-    fn store(obj: SharedBytesRef, desired: &[u8]) -> AtomicOpResult<()> {
+    fn store(&self, obj: SharedBytesRef, desired: &[u8]) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops(), fp_store,
+            self, self.ffi_ops(), fp_store,
             obj, desired,
         );
-        Ok(unsafe { Self::unchecked_store(obj, desired) })
+        Ok(unsafe { self.unchecked_store(obj, desired) })
     }
 
-    fn load(obj: SharedBytesRef, ret: &mut [u8]) -> AtomicOpResult<()> {
+    fn load(&self, obj: SharedBytesRef, ret: &mut [u8]) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops(), fp_load,
+            self, self.ffi_ops(), fp_load,
             obj, ret,
         );
-        Ok(unsafe { Self::unchecked_load(obj, ret) })
+        Ok(unsafe { self.unchecked_load(obj, ret) })
     }
 
     fn exchange(
-        obj: SharedBytesRef, desired: &[u8], ret: &mut [u8]
+        &self, obj: SharedBytesRef, desired: &[u8], ret: &mut [u8]
     ) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().xchg_ops, fp_exchange,
+            self, self.ffi_ops().xchg_ops, fp_exchange,
             obj, desired, ret,
         );
-        Ok(unsafe { Self::unchecked_exchange(obj, desired, ret) })
+        Ok(unsafe { self.unchecked_exchange(obj, desired, ret) })
     }
 
     fn compare_exchange_weak(
-        obj: SharedBytesRef, expected: &mut [u8], desired: &[u8]
+        &self, obj: SharedBytesRef, expected: &mut [u8], desired: &[u8]
     ) -> AtomicOpResult<bool> {
         do_atomic_checks!(
-            Self::ffi_ops().xchg_ops, fp_cmpxchg_weak,
+            self, self.ffi_ops().xchg_ops, fp_cmpxchg_weak,
             obj, desired, expected,
         );
         Ok(unsafe {
-            Self::unchecked_compare_exchange_weak(obj, expected, desired)
+            self.unchecked_compare_exchange_weak(obj, expected, desired)
         })
     }
 
     fn compare_exchange_strong(
-        obj: SharedBytesRef, expected: &mut [u8], desired: &[u8]
+        &self, obj: SharedBytesRef, expected: &mut [u8], desired: &[u8]
     ) -> AtomicOpResult<bool> {
         do_atomic_checks!(
-            Self::ffi_ops().xchg_ops, fp_cmpxchg_strong,
+            self, self.ffi_ops().xchg_ops, fp_cmpxchg_strong,
             obj, desired, expected,
         );
         Ok(unsafe {
-            Self::unchecked_compare_exchange_strong(obj, expected, desired)
+            self.unchecked_compare_exchange_strong(obj, expected, desired)
         })
     }
 
-    fn bit_test(obj: SharedBytesRef, offset: usize
+    fn bit_test(&self, obj: SharedBytesRef, offset: usize
     ) -> AtomicBitwiseOpResult<bool> {
         do_atomic_checks_bit_test!(
-            Self::ffi_ops().bitwise_ops, fp_test,
+            self, self.ffi_ops().bitwise_ops, fp_test,
             obj; offset
         );
-        Ok(unsafe { Self::unchecked_bit_test(obj, offset) })
+        Ok(unsafe { self.unchecked_bit_test(obj, offset) })
     }
 
-    fn bit_test_compl(obj: SharedBytesRef, offset: usize
+    fn bit_test_compl(&self, obj: SharedBytesRef, offset: usize
     ) -> AtomicBitwiseOpResult<bool> {
         do_atomic_checks_bit_test!(
-            Self::ffi_ops().bitwise_ops, fp_test_compl,
+            self, self.ffi_ops().bitwise_ops, fp_test_compl,
             obj; offset
         );
-        Ok(unsafe { Self::unchecked_bit_test_compl(obj, offset) })
+        Ok(unsafe { self.unchecked_bit_test_compl(obj, offset) })
     }
 
-    fn bit_test_set(obj: SharedBytesRef, offset: usize
+    fn bit_test_set(&self, obj: SharedBytesRef, offset: usize
     ) -> AtomicBitwiseOpResult<bool> {
         do_atomic_checks_bit_test!(
-            Self::ffi_ops().bitwise_ops, fp_test_set,
+            self, self.ffi_ops().bitwise_ops, fp_test_set,
             obj; offset
         );
-        Ok(unsafe { Self::unchecked_bit_test_set(obj, offset) })
+        Ok(unsafe { self.unchecked_bit_test_set(obj, offset) })
     }
 
-    fn bit_test_reset(obj: SharedBytesRef, offset: usize
+    fn bit_test_reset(&self, obj: SharedBytesRef, offset: usize
     ) -> AtomicBitwiseOpResult<bool> {
         do_atomic_checks_bit_test!(
-            Self::ffi_ops().bitwise_ops, fp_test_reset,
+            self, self.ffi_ops().bitwise_ops, fp_test_reset,
             obj; offset
         );
-        Ok(unsafe { Self::unchecked_bit_test_reset(obj, offset) })
+        Ok(unsafe { self.unchecked_bit_test_reset(obj, offset) })
     }
 
-    fn or(obj: SharedBytesRef, arg: &[u8]) -> AtomicOpResult<()> {
+    fn or(&self, obj: SharedBytesRef, arg: &[u8]) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().binary_ops, fp_or,
+            self, self.ffi_ops().binary_ops, fp_or,
             obj, arg,
         );
-        Ok(unsafe { Self::unchecked_or(obj, arg) })
+        Ok(unsafe { self.unchecked_or(obj, arg) })
     }
 
-    fn xor(obj: SharedBytesRef, arg: &[u8]) -> AtomicOpResult<()> {
+    fn xor(&self, obj: SharedBytesRef, arg: &[u8]) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().binary_ops, fp_xor,
+            self, self.ffi_ops().binary_ops, fp_xor,
             obj, arg,
         );
-        Ok(unsafe { Self::unchecked_xor(obj, arg) })
+        Ok(unsafe { self.unchecked_xor(obj, arg) })
     }
 
-    fn and(obj: SharedBytesRef, arg: &[u8]) -> AtomicOpResult<()> {
+    fn and(&self, obj: SharedBytesRef, arg: &[u8]) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().binary_ops, fp_and,
+            self, self.ffi_ops().binary_ops, fp_and,
             obj, arg,
         );
-        Ok(unsafe { Self::unchecked_and(obj, arg) })
+        Ok(unsafe { self.unchecked_and(obj, arg) })
     }
 
-    fn not(obj: SharedBytesRef) -> AtomicOpResult<()> {
+    fn not(&self, obj: SharedBytesRef) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().binary_ops, fp_not,
+            self, self.ffi_ops().binary_ops, fp_not,
             obj,
         );
-        Ok(unsafe { Self::unchecked_not(obj) })
+        Ok(unsafe { self.unchecked_not(obj) })
     }
 
     fn fetch_or(
-        obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
+        &self, obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
     ) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().binary_ops, fp_fetch_or,
+            self, self.ffi_ops().binary_ops, fp_fetch_or,
             obj, arg, ret,
         );
-        Ok(unsafe { Self::unchecked_fetch_or(obj, arg, ret) })
+        Ok(unsafe { self.unchecked_fetch_or(obj, arg, ret) })
     }
 
     fn fetch_xor(
-        obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
+        &self, obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
     ) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().binary_ops, fp_fetch_xor,
+            self, self.ffi_ops().binary_ops, fp_fetch_xor,
             obj, arg, ret,
         );
-        Ok(unsafe { Self::unchecked_fetch_xor(obj, arg, ret) })
+        Ok(unsafe { self.unchecked_fetch_xor(obj, arg, ret) })
     }
 
     fn fetch_and(
-        obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
+        &self, obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
     ) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().binary_ops, fp_fetch_and,
+            self, self.ffi_ops().binary_ops, fp_fetch_and,
             obj, arg, ret,
         );
-        Ok(unsafe { Self::unchecked_fetch_and(obj, arg, ret) })
+        Ok(unsafe { self.unchecked_fetch_and(obj, arg, ret) })
     }
 
-    fn fetch_not(obj: SharedBytesRef, ret: &mut [u8]) -> AtomicOpResult<()> {
+    fn fetch_not(
+        &self, obj: SharedBytesRef, ret: &mut [u8]
+    ) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().binary_ops, fp_fetch_not,
+            self, self.ffi_ops().binary_ops, fp_fetch_not,
             obj, ret,
         );
-        Ok(unsafe { Self::unchecked_fetch_not(obj, ret) })
+        Ok(unsafe { self.unchecked_fetch_not(obj, ret) })
     }
 
-    fn add(obj: SharedBytesRef, arg: &[u8]) -> AtomicOpResult<()> {
+    fn add(&self, obj: SharedBytesRef, arg: &[u8]) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().arithmetic_ops, fp_add,
+            self, self.ffi_ops().arithmetic_ops, fp_add,
             obj, arg,
         );
-        Ok(unsafe { Self::unchecked_add(obj, arg) })
+        Ok(unsafe { self.unchecked_add(obj, arg) })
     }
 
-    fn sub(obj: SharedBytesRef, arg: &[u8]) -> AtomicOpResult<()> {
+    fn sub(&self, obj: SharedBytesRef, arg: &[u8]) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().arithmetic_ops, fp_sub,
+            self, self.ffi_ops().arithmetic_ops, fp_sub,
             obj, arg,
         );
-        Ok(unsafe { Self::unchecked_sub(obj, arg) })
+        Ok(unsafe { self.unchecked_sub(obj, arg) })
     }
 
-    fn inc(obj: SharedBytesRef) -> AtomicOpResult<()> {
+    fn inc(&self, obj: SharedBytesRef) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().arithmetic_ops, fp_inc,
+            self, self.ffi_ops().arithmetic_ops, fp_inc,
             obj,
         );
-        Ok(unsafe { Self::unchecked_inc(obj) })
+        Ok(unsafe { self.unchecked_inc(obj) })
     }
 
-    fn dec(obj: SharedBytesRef) -> AtomicOpResult<()> {
+    fn dec(&self, obj: SharedBytesRef) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().arithmetic_ops, fp_dec,
+            self, self.ffi_ops().arithmetic_ops, fp_dec,
             obj,
         );
-        Ok(unsafe { Self::unchecked_dec(obj) })
+        Ok(unsafe { self.unchecked_dec(obj) })
     }
 
-    fn neg(obj: SharedBytesRef) -> AtomicOpResult<()> {
+    fn neg(&self, obj: SharedBytesRef) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().arithmetic_ops, fp_neg,
+            self, self.ffi_ops().arithmetic_ops, fp_neg,
             obj,
         );
-        Ok(unsafe { Self::unchecked_neg(obj) })
+        Ok(unsafe { self.unchecked_neg(obj) })
     }
 
     fn fetch_add(
-        obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
+        &self, obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
     ) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().arithmetic_ops, fp_fetch_add,
+            self, self.ffi_ops().arithmetic_ops, fp_fetch_add,
             obj, arg, ret,
         );
-        Ok(unsafe { Self::unchecked_fetch_add(obj, arg, ret) })
+        Ok(unsafe { self.unchecked_fetch_add(obj, arg, ret) })
     }
 
     fn fetch_sub(
-        obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
+        &self, obj: SharedBytesRef, arg: &[u8], ret: &mut [u8]
     ) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().arithmetic_ops, fp_fetch_sub,
+            self, self.ffi_ops().arithmetic_ops, fp_fetch_sub,
             obj, arg, ret,
         );
-        Ok(unsafe { Self::unchecked_fetch_sub(obj, arg, ret) })
+        Ok(unsafe { self.unchecked_fetch_sub(obj, arg, ret) })
     }
 
-    fn fetch_inc(obj: SharedBytesRef, ret: &mut [u8]) -> AtomicOpResult<()> {
+    fn fetch_inc(
+        &self, obj: SharedBytesRef, ret: &mut [u8]
+    ) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().arithmetic_ops, fp_fetch_inc,
+            self, self.ffi_ops().arithmetic_ops, fp_fetch_inc,
             obj, ret,
         );
-        Ok(unsafe { Self::unchecked_fetch_inc(obj, ret) })
+        Ok(unsafe { self.unchecked_fetch_inc(obj, ret) })
     }
 
-    fn fetch_dec(obj: SharedBytesRef, ret: &mut [u8]) -> AtomicOpResult<()> {
+    fn fetch_dec(
+        &self, obj: SharedBytesRef, ret: &mut [u8]
+    ) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().arithmetic_ops, fp_fetch_dec,
+            self, self.ffi_ops().arithmetic_ops, fp_fetch_dec,
             obj, ret,
         );
-        Ok(unsafe { Self::unchecked_fetch_dec(obj, ret) })
+        Ok(unsafe { self.unchecked_fetch_dec(obj, ret) })
     }
 
-    fn fetch_neg(obj: SharedBytesRef, ret: &mut [u8]) -> AtomicOpResult<()> {
+    fn fetch_neg(
+        &self, obj: SharedBytesRef, ret: &mut [u8]
+    ) -> AtomicOpResult<()> {
         do_atomic_checks!(
-            Self::ffi_ops().arithmetic_ops, fp_fetch_neg,
+            self, self.ffi_ops().arithmetic_ops, fp_fetch_neg,
             obj, ret,
         );
-        Ok(unsafe { Self::unchecked_fetch_neg(obj, ret) })
+        Ok(unsafe { self.unchecked_fetch_neg(obj, ret) })
     }
 }

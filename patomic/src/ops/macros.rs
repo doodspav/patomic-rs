@@ -3,6 +3,7 @@
 
 macro_rules! do_atomic_checks {
     (
+        $self:ident,
         $ops:expr,
         $fp:ident,
         $obj:ident
@@ -16,7 +17,7 @@ macro_rules! do_atomic_checks {
         };
 
         // check that atomic object is suitably aligned
-        if !Self::alignment().is_met_by($obj) {
+        if !$self.alignment().is_met_by($obj) {
             return Err(
                 $crate::error::AtomicOpError::InvalidAlignment.into()
             );
@@ -24,7 +25,7 @@ macro_rules! do_atomic_checks {
 
         // check that all objects have the expected width
         {
-            let width = Self::width().get();
+            let width = $self.width().get();
             if $obj.len() != width {
                 return Err(
                     $crate::error::AtomicOpError::InvalidSize.into()
@@ -43,6 +44,7 @@ macro_rules! do_atomic_checks {
 
 macro_rules! do_atomic_checks_bit_test {
     (
+        $self:ident,
         $ops:expr,
         $fp:ident,
         $obj:ident
@@ -50,7 +52,7 @@ macro_rules! do_atomic_checks_bit_test {
         $offset:ident $(,)?
     ) => {
         // do initial checks
-        do_atomic_checks!($ops, $fp, $obj $(, $bytes)*);
+        do_atomic_checks!($self, $ops, $fp, $obj $(, $bytes)*);
 
         // check that offset does not go out of bounds
         let bit_width = $obj.len() * (u8::BITS as usize);

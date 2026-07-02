@@ -10,8 +10,8 @@ use patomic_sys::*;
 use crate::SharedBytesRef;
 
 pub trait AtomicLayout {
-    fn width() -> NonZeroUsize;
-    fn alignment() -> Alignment;
+    fn width(&self) -> NonZeroUsize;
+    fn alignment(&self) -> Alignment;
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
