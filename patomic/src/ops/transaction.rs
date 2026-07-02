@@ -1,7 +1,11 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use crate::{SharedFlagRef, TransactionError, TransactionResult};
+use crate::SharedFlagRef;
+
+use crate::error::{
+    TransactionError, TransactionResult
+};
 
 use crate::ops::UncheckedTransactionOps;
 

@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 mod align;
-mod error;
+pub mod error;
 mod ordering;
 pub mod ops;
 mod shared;
 mod transaction;
 
 pub use align::*;
-pub use error::*;
 pub use ordering::*;
 pub use shared::*;
 pub use transaction::*;
