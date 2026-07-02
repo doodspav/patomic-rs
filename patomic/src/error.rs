@@ -131,3 +131,59 @@ define_error!(
 );
 
 pub type TransactionResult<T> = Result<T, TransactionError>;
+
+define_error!(
+    TransactionBitwiseOpError => [
+        TransactionError,
+    ] {
+        UnsupportedOperation,
+        InvalidSize,
+        InvalidOffset,
+    }
+);
+
+pub type TransactionBitwiseOpResult<T> = Result<T, TransactionBitwiseOpError>;
+
+define_error!(
+    TransactionOpError => [
+        TransactionBitwiseOpError,
+        TransactionError,
+    ] {
+        UnsupportedOperation,
+        InvalidSize,
+    }
+);
+
+pub type TransactionOpResult<T> = Result<T, TransactionOpError>;
+
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+pub struct TransactionUnsupportedOpError;
+
+impl core::fmt::Display for TransactionUnsupportedOpError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str(messages::UnsupportedOperation)
+    }
+}
+
+impl std::error::Error for TransactionUnsupportedOpError {}
+
+impl From<TransactionUnsupportedOpError> for TransactionOpError {
+    fn from(_: TransactionUnsupportedOpError) -> Self {
+        Self::UnsupportedOperation
+    }
+}
+
+impl From<TransactionUnsupportedOpError> for TransactionBitwiseOpError {
+    fn from(_: TransactionUnsupportedOpError) -> Self {
+        Self::UnsupportedOperation
+    }
+}
+
+impl From<TransactionUnsupportedOpError> for TransactionError {
+    fn from(_: TransactionUnsupportedOpError) -> Self {
+        Self::UnsupportedOperation
+    }
+}
+
+pub type TransactionUnsupportedOpResult<T> =
+    Result<T, TransactionUnsupportedOpError>;
