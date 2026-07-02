@@ -10,23 +10,31 @@ macro_rules! do_atomic_checks {
     ) => {
         // check that operation is supported
         if $ops.$fp.is_none() {
-            return Err(AtomicOpError::UnsupportedOperation.into());
+            return Err(
+                $crate::error::AtomicOpError::UnsupportedOperation.into()
+            );
         };
 
         // check that atomic object is suitably aligned
         if !Self::alignment().is_met_by($obj) {
-            return Err(AtomicOpError::InvalidAlignment.into());
+            return Err(
+                $crate::error::AtomicOpError::InvalidAlignment.into()
+            );
         }
 
         // check that all objects have the expected width
         {
             let width = Self::width().get();
             if $obj.len() != width {
-                return Err(AtomicOpError::InvalidSize.into());
+                return Err(
+                    $crate::error::AtomicOpError::InvalidSize.into()
+                );
             }
             $(
                 if $bytes.len() != width {
-                    return Err(AtomicOpError::InvalidSize.into());
+                    return Err(
+                        $crate::error::AtomicOpError::InvalidSize.into()
+                    );
                 }
             )*
         }
@@ -46,8 +54,10 @@ macro_rules! do_atomic_checks_bit_test {
 
         // check that offset does not go out of bounds
         let bit_width = $obj.len() * (u8::BITS as usize);
-        if $offset >= bit_width || $offset > c_int::MAX as usize {
-            return Err(AtomicBitwiseOpError::InvalidOffset.into());
+        if $offset >= bit_width || $offset > ::core::ffi::c_int::MAX as usize {
+            return Err(
+                $crate::error::AtomicBitwiseOpError::InvalidOffset.into()
+            );
         }
     };
 }

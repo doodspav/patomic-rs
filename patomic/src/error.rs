@@ -28,21 +28,21 @@ macro_rules! define_error {
             $($variant,)+
         }
 
-        impl core::fmt::Display for $name {
+        impl ::core::fmt::Display for $name {
             fn fmt(
-                &self, f: &mut core::fmt::Formatter<'_>
-            ) -> core::fmt::Result {
+                &self, f: &mut ::core::fmt::Formatter<'_>
+            ) -> ::core::fmt::Result {
                 f.write_str(match self {
-                    $(Self::$variant => messages::$variant,)+
+                    $(Self::$variant => $crate::error::messages::$variant,)+
                 })
             }
         }
 
-        impl core::error::Error for $name {}
+        impl ::core::error::Error for $name {}
     };
 
     (@from $name:ident => $into:ty { $($variant:ident),+ $(,)? }) => {
-        impl From<$name> for $into {
+        impl ::core::convert::From<$name> for $into {
             fn from(e: $name) -> Self {
                 match e {
                     $(<$name>::$variant => Self::$variant,)+

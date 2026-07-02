@@ -1,15 +1,13 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use core::ffi::c_int;
-
 use crate::{AtomicLayout, Ordering, SharedBytesRef};
 
 use crate::error::{
-    AtomicOpError, AtomicOpResult,
-    AtomicBitwiseOpError, AtomicBitwiseOpResult,
-    AtomicExplicitAccessOpError, AtomicExplicitAccessOpResult,
-    AtomicExplicitBitTestOpError, AtomicExplicitBitTestOpResult,
+    AtomicOpResult,
+    AtomicBitwiseOpResult,
+    AtomicExplicitAccessOpResult, AtomicExplicitAccessOpError,
+    AtomicExplicitBitTestOpResult, AtomicExplicitBitTestOpError,
 };
 
 use crate::ops::UncheckedExplicitOps;
