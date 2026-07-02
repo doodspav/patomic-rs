@@ -84,8 +84,8 @@ pub struct TransactionOutcome {
     pub attempts_made: u32,
 }
 
-impl TransactionOutcome {
-    pub const fn from_ffi(result: patomic_transaction_result_t) -> Self {
+impl From<patomic_transaction_result_t> for TransactionOutcome {
+    fn from(result: patomic_transaction_result_t) -> Self {
         Self {
             status: TransactionStatus::from_ffi(result.status),
             attempts_made: result.attempts_made as u32,
@@ -102,8 +102,8 @@ pub struct TransactionOutcomeWfb {
     pub fallback_attempts_made: u32,
 }
 
-impl TransactionOutcomeWfb {
-    pub const fn from_ffi(result: patomic_transaction_result_wfb_t) -> Self {
+impl From<patomic_transaction_result_wfb_t> for TransactionOutcomeWfb {
+    fn from(result: patomic_transaction_result_wfb_t) -> Self {
         Self {
             status: TransactionStatus::from_ffi(result.status),
             attempts_made: result.attempts_made as u32,
