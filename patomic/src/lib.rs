@@ -2,16 +2,23 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 mod align;
-pub mod error;
 mod ordering;
-pub mod ops;
 mod shared;
 mod transaction;
 
-pub use align::*;
-pub use ordering::*;
-pub use shared::*;
-pub use transaction::*;
+pub mod error;
+pub mod ops;
+
+pub use align::{Alignment, AtomicLayout};
+pub use error::{
+    AtomicError, AtomicResult,
+    TransactionError, TransactionResult,
+};
+pub use ordering::Ordering;
+pub use shared::{
+    SharedBytesRef,
+    SharedFlag, SharedFlagRef
+};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
