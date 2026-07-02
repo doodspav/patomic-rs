@@ -1,11 +1,13 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use core::ffi::c_ulong;
+use core::ffi::{c_ulong, c_void};
 
 use bitflags::bitflags;
 
 use patomic_sys::*;
+
+use crate::{SharedBytesRef, SharedFlagRef};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TransactionExitCode {
@@ -88,6 +90,61 @@ impl TransactionOutcomeWfb {
             attempts_made: result.attempts_made as u32,
             fallback_status: TransactionStatus::from_ffi(result.fallback_status),
             fallback_attempts_made: result.fallback_attempts_made as u32,
+        }
+    }
+}
+
+pub struct CmpxchgOperands<'a> {
+    pub obj: SharedBytesRef<'a>,
+    pub expected: &'a mut [u8],
+    pub desired: &'a [u8],
+}
+
+impl From<CmpxchgOperands<'_>> for patomic_transaction_cmpxchg_t {
+    fn from(value: CmpxchgOperands<'_>) -> Self {
+        Self {
+            obj: value.obj.as_mut_ptr() as *mut c_void,
+            expected: value.expected.as_mut_ptr() as *mut c_void,
+            desired: value.desired.as_ptr() as *const c_void,
+        }
+    }
+}
+
+pub struct TransactionConfig<'a> {
+    pub width: usize,
+    pub attempts: u32,
+    pub flag: Option<SharedFlagRef<'a>>
+}
+
+impl From<TransactionConfig<'_>> for patomic_transaction_config_t {
+    fn from(value: TransactionConfig<'_>) -> Self {
+        Self {
+            width: value.width,
+            attempts: value.attempts as c_ulong,
+            flag_nullable: value.flag
+                .map_or(core::ptr::null(), |f| f.as_ptr()),
+        }
+    }
+}
+
+pub struct TransactionConfigWfb<'a> {
+    pub width: usize,
+    pub attempts: u32,
+    pub fallback_attempts: u32,
+    pub flag: Option<SharedFlagRef<'a>>,
+    pub fallback_flag: Option<SharedFlagRef<'a>>,
+}
+
+impl From<TransactionConfigWfb<'_>> for patomic_transaction_config_wfb_t {
+    fn from(value: TransactionConfigWfb<'_>) -> Self {
+        Self {
+            width: value.width,
+            attempts: value.attempts as c_ulong,
+            fallback_attempts: value.fallback_attempts as c_ulong,
+            flag_nullable: value.flag
+                .map_or(core::ptr::null(), |f| f.as_ptr()),
+            fallback_flag_nullable: value.fallback_flag
+                .map_or(core::ptr::null(), |f| f.as_ptr()),
         }
     }
 }
