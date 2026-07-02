@@ -2,12 +2,31 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use core::ffi::{c_ulong, c_void};
+use core::cell::UnsafeCell;
 
 use bitflags::bitflags;
+
+use crossbeam_utils::CachePadded;
 
 use patomic_sys::*;
 
 use crate::{SharedBytesRef, SharedFlagRef};
+
+pub struct TransactionFlag {
+    flag: CachePadded<UnsafeCell<u8>>,
+}
+
+impl TransactionFlag {
+    pub const fn new() -> Self {
+        Self {
+            flag: CachePadded::new(UnsafeCell::new(0)),
+        }
+    }
+
+    pub fn as_ref(&'_ self) -> SharedFlagRef<'_> {
+        SharedFlagRef::from_cell(&self.flag)
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TransactionExitCode {

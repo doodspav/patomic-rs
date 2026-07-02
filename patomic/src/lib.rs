@@ -15,10 +15,7 @@ pub use error::{
     TransactionError, TransactionResult,
 };
 pub use ordering::Ordering;
-pub use shared::{
-    SharedBytesRef,
-    SharedFlag, SharedFlagRef
-};
+pub use shared::{SharedBytesRef, SharedFlagRef};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
