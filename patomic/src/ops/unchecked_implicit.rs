@@ -7,9 +7,11 @@ use patomic_sys::*;
 
 use crate::SharedBytesRef;
 
-pub trait UncheckedImplicitOps {
+pub unsafe trait FfiOpsImplicit {
     fn ffi_ops() -> patomic_ops_t;
+}
 
+pub trait UncheckedImplicitOps: FfiOpsImplicit {
     unsafe fn unchecked_store(obj: SharedBytesRef, desired: &[u8]) {
         let fp_store = Self::ffi_ops().fp_store.unwrap_unchecked();
         fp_store(

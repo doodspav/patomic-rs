@@ -5,9 +5,11 @@ use patomic_sys::*;
 
 use crate::SharedFlagRef;
 
-pub trait UncheckedTransactionOps {
+pub unsafe trait FfiOpsTransaction {
     fn ffi_ops() -> patomic_ops_transaction_t;
-    
+}
+
+pub trait UncheckedTransactionOps: FfiOpsTransaction {
     unsafe fn unchecked_flag_test(flag: SharedFlagRef) -> bool {
         let fp_test = Self::ffi_ops().flag_ops.fp_test.unwrap_unchecked();
         fp_test(flag.as_ptr() as *const patomic_transaction_flag_t) != 0

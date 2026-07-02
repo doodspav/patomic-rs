@@ -7,9 +7,11 @@ use patomic_sys::*;
 
 use crate::{Ordering, SharedBytesRef};
 
-pub trait UncheckedExplicitOps {
+pub unsafe trait FfiOpsExplicit {
     fn ffi_ops() -> patomic_ops_explicit_t;
+}
 
+pub trait UncheckedExplicitOps: FfiOpsExplicit {
     unsafe fn unchecked_store_explicit(
         obj: SharedBytesRef, ordering: Ordering, desired: &[u8]
     ) {
