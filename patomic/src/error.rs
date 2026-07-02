@@ -1,65 +1,123 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-macro_rules! widen_error {
-    ($from:ty => $to:ty { $($variant:ident),+ $(,)? }) => {
-        impl From<$from> for $to {
-            fn from(e: $from) -> Self {
+macro_rules! define_error {
+    // Without conversions.
+    ($name:ident $variants:tt) => {
+        define_error!(@define $name $variants);
+    };
+
+    // With conversions: targets in brackets.
+    ($name:ident => [$($into:ty),+ $(,)?] $variants:tt) => {
+        define_error!(@define $name $variants);
+        $( define_error!(@from $name => $into $variants); )+
+    };
+
+    (@define $name:ident { $($variant:ident),+ $(,)? }) => {
+        #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+        pub enum $name {
+            $($variant,)+
+        }
+
+        impl core::fmt::Display for $name {
+            fn fmt(
+                &self, f: &mut core::fmt::Formatter<'_>
+            ) -> core::fmt::Result {
+                f.write_str(match self {
+                    $(Self::$variant => messages::$variant,)+
+                })
+            }
+        }
+
+        impl core::error::Error for $name {}
+    };
+
+    (@from $name:ident => $into:ty { $($variant:ident),+ $(,)? }) => {
+        impl From<$name> for $into {
+            fn from(e: $name) -> Self {
                 match e {
-                    $(<$from>::$variant => Self::$variant,)+
+                    $(<$name>::$variant => Self::$variant,)+
                 }
             }
         }
     };
 }
 
-// applies to most operations
-pub enum AtomicOpError {
-    UnsupportedOperation,
-    InvalidSize,
-    InvalidAlignment,
+#[allow(non_upper_case_globals)]
+mod messages {
+    pub const UnsupportedOperation: &str = "The operation is not supported by this backend on this platform";
+    pub const InvalidSize: &str = "The size of an object used by this operation does not match the expected width";
+    pub const InvalidAlignment: &str = "The alignment of the shared object is insufficient for this operation on this backend and platform";
+    pub const InvalidOffset: &str = "The offset used would exceed the bounds of the shared object";
+    pub const InvalidOrdering: &str = "The ordering used is not valid for this operation";
 }
 
-widen_error!(AtomicOpError => AtomicBitwiseOpError {
-    UnsupportedOperation, InvalidSize, InvalidAlignment,
-});
+define_error!(
+    AtomicError {
+        UnsupportedOperation,
+        InvalidSize,
+        InvalidAlignment,
+        InvalidOffset,
+        InvalidOrdering,
+    }
+);
 
-widen_error!(AtomicOpError => AtomicExplicitAccessOpError {
-    UnsupportedOperation, InvalidSize, InvalidAlignment,
-});
+pub type AtomicResult<T> = Result<T, AtomicError>;
 
-widen_error!(AtomicOpError => AtomicExplicitBitTestOpError {
-    UnsupportedOperation, InvalidSize, InvalidAlignment,
-});
+define_error!(
+    AtomicExplicitBitTestOpError => [
+        AtomicError
+    ] {
+        UnsupportedOperation,
+        InvalidSize,
+        InvalidAlignment,
+        InvalidOffset,
+        InvalidOrdering,
+    }
+);
 
-// applies to bitwise operations (that have an offset)
-pub enum AtomicBitwiseOpError {
-    UnsupportedOperation,
-    InvalidSize,
-    InvalidAlignment,
-    InvalidOffset,
-}
+pub type AtomicExplicitBitTestOpResult<T> =
+    Result<T, AtomicExplicitBitTestOpError>;
 
-widen_error!(AtomicBitwiseOpError => AtomicExplicitBitTestOpError {
-    UnsupportedOperation, InvalidSize, InvalidAlignment, InvalidOffset,
-});
+define_error!(
+    AtomicExplicitAccessOpError => [
+        AtomicError
+    ] {
+        UnsupportedOperation,
+        InvalidSize,
+        InvalidAlignment,
+        InvalidOrdering,
+    }
+);
 
-// applies to explicit operations that have special ordering
-// these are operations that only do load or store, not rmw
-// load, store, cmpxchg (because of fail)
-pub enum AtomicExplicitAccessOpError {
-    UnsupportedOperation,
-    InvalidSize,
-    InvalidAlignment,
-    InvalidOrdering,
-}
+pub type AtomicExplicitAccessOpResult<T> =
+    Result<T, AtomicExplicitAccessOpError>;
 
-// applies only to explicit bit test
-// has both special ordering (load) and offset
-pub enum AtomicExplicitBitTestOpError {
-    UnsupportedOperation,
-    InvalidSize,
-    InvalidAlignment,
-    InvalidOffset,
-    InvalidOrdering,
-}
+define_error!(
+    AtomicBitwiseOpError => [
+        AtomicExplicitBitTestOpError,
+        AtomicError
+    ] {
+        UnsupportedOperation,
+        InvalidSize,
+        InvalidAlignment,
+        InvalidOffset,
+    }
+);
+
+pub type AtomicBitwiseOpResult<T> = Result<T, AtomicBitwiseOpError>;
+
+define_error!(
+    AtomicOpError => [
+        AtomicBitwiseOpError,
+        AtomicExplicitAccessOpError,
+        AtomicExplicitBitTestOpError,
+        AtomicError
+    ] {
+        UnsupportedOperation,
+        InvalidSize,
+        InvalidAlignment,
+    }
+);
+
+pub type AtomicOpResult<T> = Result<T, AtomicOpError>;
