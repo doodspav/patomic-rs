@@ -272,6 +272,152 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         outcome.assume_init().into()
     }
 
+    unsafe fn unchecked_add_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], config: TransactionConfig
+    ) -> TransactionOutcome {
+        let fp_add = self.ffi_ops().arithmetic_ops.fp_add.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        fp_add(
+            obj.as_mut_ptr() as *mut c_void,
+            arg.as_ptr() as *const c_void,
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+        outcome.assume_init().into()
+    }
+
+    unsafe fn unchecked_sub_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], config: TransactionConfig
+    ) -> TransactionOutcome {
+        let fp_sub = self.ffi_ops().arithmetic_ops.fp_sub.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        fp_sub(
+            obj.as_mut_ptr() as *mut c_void,
+            arg.as_ptr() as *const c_void,
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+        outcome.assume_init().into()
+    }
+
+    unsafe fn unchecked_inc_transaction(
+        &self, obj: SharedBytesRef, config: TransactionConfig
+    ) -> TransactionOutcome {
+        let fp_inc = self.ffi_ops().arithmetic_ops.fp_inc.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        fp_inc(
+            obj.as_mut_ptr() as *mut c_void,
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+        outcome.assume_init().into()
+    }
+
+    unsafe fn unchecked_dec_transaction(
+        &self, obj: SharedBytesRef, config: TransactionConfig
+    ) -> TransactionOutcome {
+        let fp_dec = self.ffi_ops().arithmetic_ops.fp_dec.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        fp_dec(
+            obj.as_mut_ptr() as *mut c_void,
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+        outcome.assume_init().into()
+    }
+
+    unsafe fn unchecked_neg_transaction(
+        &self, obj: SharedBytesRef, config: TransactionConfig
+    ) -> TransactionOutcome {
+        let fp_neg = self.ffi_ops().arithmetic_ops.fp_neg.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        fp_neg(
+            obj.as_mut_ptr() as *mut c_void,
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+        outcome.assume_init().into()
+    }
+
+    unsafe fn unchecked_fetch_add_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], ret: &mut [u8],
+        config: TransactionConfig
+    ) -> TransactionOutcome {
+        let fp_fetch_add =
+            self.ffi_ops().arithmetic_ops.fp_fetch_add.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        fp_fetch_add(
+            obj.as_mut_ptr() as *mut c_void,
+            arg.as_ptr() as *const c_void,
+            ret.as_mut_ptr() as *mut c_void,
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+        outcome.assume_init().into()
+    }
+
+    unsafe fn unchecked_fetch_sub_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], ret: &mut [u8],
+        config: TransactionConfig
+    ) -> TransactionOutcome {
+        let fp_fetch_sub =
+            self.ffi_ops().arithmetic_ops.fp_fetch_sub.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        fp_fetch_sub(
+            obj.as_mut_ptr() as *mut c_void,
+            arg.as_ptr() as *const c_void,
+            ret.as_mut_ptr() as *mut c_void,
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+        outcome.assume_init().into()
+    }
+
+    unsafe fn unchecked_fetch_inc_transaction(
+        &self, obj: SharedBytesRef, ret: &mut [u8], config: TransactionConfig
+    ) -> TransactionOutcome {
+        let fp_fetch_inc =
+            self.ffi_ops().arithmetic_ops.fp_fetch_inc.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        fp_fetch_inc(
+            obj.as_mut_ptr() as *mut c_void,
+            ret.as_mut_ptr() as *mut c_void,
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+        outcome.assume_init().into()
+    }
+
+    unsafe fn unchecked_fetch_dec_transaction(
+        &self, obj: SharedBytesRef, ret: &mut [u8], config: TransactionConfig
+    ) -> TransactionOutcome {
+        let fp_fetch_dec =
+            self.ffi_ops().arithmetic_ops.fp_fetch_dec.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        fp_fetch_dec(
+            obj.as_mut_ptr() as *mut c_void,
+            ret.as_mut_ptr() as *mut c_void,
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+        outcome.assume_init().into()
+    }
+
+    unsafe fn unchecked_fetch_neg_transaction(
+        &self, obj: SharedBytesRef, ret: &mut [u8], config: TransactionConfig
+    ) -> TransactionOutcome {
+        let fp_fetch_neg =
+            self.ffi_ops().arithmetic_ops.fp_fetch_neg.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        fp_fetch_neg(
+            obj.as_mut_ptr() as *mut c_void,
+            ret.as_mut_ptr() as *mut c_void,
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+        outcome.assume_init().into()
+    }
+
     unsafe fn unchecked_flag_test(&self, flag: SharedFlagRef) -> bool {
         let fp_test = self.ffi_ops().flag_ops.fp_test.unwrap_unchecked();
         fp_test(flag.as_ptr() as *const patomic_transaction_flag_t) != 0
