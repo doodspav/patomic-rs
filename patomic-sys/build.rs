@@ -4,6 +4,7 @@ fn main() {
         .define("BUILD_SHARED_LIBS", "OFF")
         .define("BUILD_TESTING", "OFF")
         .define("CMAKE_INSTALL_LIBDIR", "lib")
+        .define("CMAKE_POSITION_INDEPENDENT_CODE", "ON")
         .build();
 
     // add CMake's LIB_DIR to the search path
