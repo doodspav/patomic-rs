@@ -92,6 +92,65 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         outcome.assume_init().into()
     }
 
+    unsafe fn unchecked_bit_test_transaction(
+        &self, obj: SharedBytesRef, offset: usize, config: TransactionConfig
+    ) -> (bool, TransactionOutcome) {
+        let fp_test = self.ffi_ops().bitwise_ops.fp_test.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        let bit = fp_test(
+            obj.as_mut_ptr() as *const c_void,
+            offset as c_int,
+            config.into(),
+            outcome.as_mut_ptr(),
+        ) != 0;
+        (bit, outcome.assume_init().into())
+    }
+
+    unsafe fn unchecked_bit_test_compl_transaction(
+        &self, obj: SharedBytesRef, offset: usize, config: TransactionConfig
+    ) -> (bool, TransactionOutcome) {
+        let fp_test_compl =
+            self.ffi_ops().bitwise_ops.fp_test_compl.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        let bit = fp_test_compl(
+            obj.as_mut_ptr() as *mut c_void,
+            offset as c_int,
+            config.into(),
+            outcome.as_mut_ptr(),
+        ) != 0;
+        (bit, outcome.assume_init().into())
+    }
+
+    unsafe fn unchecked_bit_test_set_transaction(
+        &self, obj: SharedBytesRef, offset: usize, config: TransactionConfig
+    ) -> (bool, TransactionOutcome) {
+        let fp_test_set =
+            self.ffi_ops().bitwise_ops.fp_test_set.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        let bit = fp_test_set(
+            obj.as_mut_ptr() as *mut c_void,
+            offset as c_int,
+            config.into(),
+            outcome.as_mut_ptr(),
+        ) != 0;
+        (bit, outcome.assume_init().into())
+    }
+
+    unsafe fn unchecked_bit_test_reset_transaction(
+        &self, obj: SharedBytesRef, offset: usize, config: TransactionConfig
+    ) -> (bool, TransactionOutcome) {
+        let fp_test_reset =
+            self.ffi_ops().bitwise_ops.fp_test_reset.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        let bit = fp_test_reset(
+            obj.as_mut_ptr() as *mut c_void,
+            offset as c_int,
+            config.into(),
+            outcome.as_mut_ptr(),
+        ) != 0;
+        (bit, outcome.assume_init().into())
+    }
+
     unsafe fn unchecked_flag_test(&self, flag: SharedFlagRef) -> bool {
         let fp_test = self.ffi_ops().flag_ops.fp_test.unwrap_unchecked();
         fp_test(flag.as_ptr() as *const patomic_transaction_flag_t) != 0
