@@ -1,7 +1,7 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use core::ffi::{c_int, c_uchar, c_ulong, c_void};
+use core::ffi::{c_int, c_uchar, c_uint, c_ulong, c_void};
 
 use crate::PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE;
 
@@ -84,8 +84,8 @@ pub const fn PATOMIC_TRANSACTION_STATUS_EXIT_CODE(
 #[inline]
 pub const fn PATOMIC_TRANSACTION_STATUS_EXIT_INFO(
     status: c_ulong,
-) -> patomic_transaction_exit_info_t {
-    ((status >> 16) & 0xff) as c_int
+) -> c_uint {
+    ((status >> 16) & 0xff) as c_uint
 }
 
 #[inline]
@@ -102,7 +102,7 @@ unsafe extern "C" {
 
     pub fn patomic_transaction_status_exit_info(
         status: c_ulong,
-    ) -> patomic_transaction_exit_info_t;
+    ) -> c_uint;
 
     pub fn patomic_transaction_status_abort_reason(
         status: c_ulong,
@@ -151,7 +151,7 @@ mod tests {
         for info in 0..=0xFF as c_ulong {
             let status = info << 16;
             assert_eq!(
-                info as patomic_transaction_exit_info_t,
+                info as c_uint,
                 PATOMIC_TRANSACTION_STATUS_EXIT_INFO(status)
             );
         }
