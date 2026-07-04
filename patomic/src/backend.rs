@@ -96,7 +96,7 @@ pub struct AtomicBackendBuilder {
 }
 
 impl AtomicBackendBuilder {
-    const fn new(width: NonZeroUsize) -> Self {
+    pub const fn new(width: NonZeroUsize) -> Self {
         Self {
             width,
             ordering: Ordering::SeqCst,
@@ -106,22 +106,22 @@ impl AtomicBackendBuilder {
         }
     }
 
-    const fn implicit_ordering(mut self, ordering: Ordering) -> Self {
+    pub const fn implicit_ordering(mut self, ordering: Ordering) -> Self {
         self.ordering = ordering;
         self
     }
 
-    const fn ids(mut self, ids: Id) -> Self {
+    pub const fn ids(mut self, ids: Id) -> Self {
         self.ids = ids;
         self
     }
 
-    const fn kinds(mut self, kinds: Kind) -> Self {
+    pub const fn kinds(mut self, kinds: Kind) -> Self {
         self.kinds = kinds;
         self
     }
 
-    const fn hints(mut self, hints: Hint) -> Self {
+    pub const fn hints(mut self, hints: Hint) -> Self {
         self.hints = hints;
         self
     }
@@ -160,7 +160,7 @@ pub struct TransactionBackendBuilder {
 }
 
 impl TransactionBackendBuilder {
-    const fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             ids: Id::ALL,
             kinds: Kind::all(),
@@ -168,17 +168,17 @@ impl TransactionBackendBuilder {
         }
     }
 
-    const fn ids(mut self, ids: Id) -> Self {
+    pub const fn ids(mut self, ids: Id) -> Self {
         self.ids = ids;
         self
     }
 
-    const fn kinds(mut self, kinds: Kind) -> Self {
+    pub const fn kinds(mut self, kinds: Kind) -> Self {
         self.kinds = kinds;
         self
     }
 
-    const fn hints(mut self, hints: Hint) -> Self {
+    pub const fn hints(mut self, hints: Hint) -> Self {
         self.hints = hints;
         self
     }
