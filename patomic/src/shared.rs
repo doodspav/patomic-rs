@@ -40,6 +40,30 @@ impl<'a> SharedBytesRef<'a> {
     }
 }
 
+impl<'a> From<&'a mut [u8]> for SharedBytesRef<'a> {
+    fn from(bytes: &'a mut [u8]) -> Self {
+        Self::from_mut(bytes)
+    }
+}
+
+impl<'a, const N: usize> From<&'a mut [u8; N]> for SharedBytesRef<'a> {
+    fn from(bytes: &'a mut [u8; N]) -> Self {
+        Self::from_mut(bytes.as_mut_slice())
+    }
+}
+
+impl<'a> From<&'a [UnsafeCell<u8>]> for SharedBytesRef<'a> {
+    fn from(bytes: &'a [UnsafeCell<u8>]) -> Self {
+        Self::from_cells(bytes)
+    }
+}
+
+impl<'a, const N: usize> From<&'a [UnsafeCell<u8>; N]> for SharedBytesRef<'a> {
+    fn from(bytes: &'a [UnsafeCell<u8>; N]) -> Self {
+        Self::from_cells(bytes.as_slice())
+    }
+}
+
 #[derive(Clone, Copy)]
 #[repr(transparent)]
 pub struct SharedFlagRef<'a> {
@@ -66,5 +90,17 @@ impl<'a> SharedFlagRef<'a> {
 
     pub fn as_mut_ptr(&self) -> *mut u8 {
         self.flag.get()
+    }
+}
+
+impl<'a> From<&'a mut u8> for SharedFlagRef<'a> {
+    fn from(flag: &'a mut u8) -> Self {
+        Self::from_mut(flag)
+    }
+}
+
+impl<'a> From<&'a UnsafeCell<u8>> for SharedFlagRef<'a> {
+    fn from(flag: &'a UnsafeCell<u8>) -> Self {
+        Self::from_cell(flag)
     }
 }
