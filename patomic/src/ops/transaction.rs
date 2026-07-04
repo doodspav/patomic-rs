@@ -199,6 +199,118 @@ pub trait TransactionOps: UncheckedTransactionOps {
         Ok(unsafe { self.unchecked_fetch_not_transaction(obj, ret, config) })
     }
 
+    fn add_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().arithmetic_ops, fp_add, config,
+            obj, arg,
+        );
+        Ok(unsafe { self.unchecked_add_transaction(obj, arg, config) })
+    }
+
+    fn sub_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().arithmetic_ops, fp_sub, config,
+            obj, arg,
+        );
+        Ok(unsafe { self.unchecked_sub_transaction(obj, arg, config) })
+    }
+
+    fn inc_transaction(
+        &self, obj: SharedBytesRef, config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().arithmetic_ops, fp_inc, config,
+            obj,
+        );
+        Ok(unsafe { self.unchecked_inc_transaction(obj, config) })
+    }
+
+    fn dec_transaction(
+        &self, obj: SharedBytesRef, config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().arithmetic_ops, fp_dec, config,
+            obj,
+        );
+        Ok(unsafe { self.unchecked_dec_transaction(obj, config) })
+    }
+
+    fn neg_transaction(
+        &self, obj: SharedBytesRef, config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().arithmetic_ops, fp_neg, config,
+            obj,
+        );
+        Ok(unsafe { self.unchecked_neg_transaction(obj, config) })
+    }
+
+    fn fetch_add_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], ret: &mut [u8],
+        config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().arithmetic_ops, fp_fetch_add, config,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            self.unchecked_fetch_add_transaction(obj, arg, ret, config)
+        })
+    }
+
+    fn fetch_sub_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], ret: &mut [u8],
+        config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().arithmetic_ops, fp_fetch_sub, config,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            self.unchecked_fetch_sub_transaction(obj, arg, ret, config)
+        })
+    }
+
+    fn fetch_inc_transaction(
+        &self, obj: SharedBytesRef, ret: &mut [u8], config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().arithmetic_ops, fp_fetch_inc, config,
+            obj, ret,
+        );
+        Ok(unsafe {
+            self.unchecked_fetch_inc_transaction(obj, ret, config)
+        })
+    }
+
+    fn fetch_dec_transaction(
+        &self, obj: SharedBytesRef, ret: &mut [u8], config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().arithmetic_ops, fp_fetch_dec, config,
+            obj, ret,
+        );
+        Ok(unsafe {
+            self.unchecked_fetch_dec_transaction(obj, ret, config)
+        })
+    }
+
+    fn fetch_neg_transaction(
+        &self, obj: SharedBytesRef, ret: &mut [u8], config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().arithmetic_ops, fp_fetch_neg, config,
+            obj, ret,
+        );
+        Ok(unsafe {
+            self.unchecked_fetch_neg_transaction(obj, ret, config)
+        })
+    }
+
     fn flag_test(
         &self, flag: SharedFlagRef
     ) -> TransactionUnsupportedOpResult<bool> {
