@@ -73,6 +73,13 @@ impl Kind {
     }
 }
 
+bitflags! {
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    pub struct Hint: u16 {
+        const NONE = patomic_option_NONE as u16;
+    }
+}
+
 #[derive(Debug, Copy, Clone)]
 pub struct AtomicBackend {
     width: NonZeroUsize,
