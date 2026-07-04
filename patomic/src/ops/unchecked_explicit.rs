@@ -19,7 +19,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_store(
             obj.as_mut_ptr() as *mut c_void,
             desired.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
         )
     }
 
@@ -29,7 +29,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         let fp_load = self.ffi_ops().fp_load.unwrap_unchecked();
         fp_load(
             obj.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
             ret.as_mut_ptr() as *mut c_void,
         )
     }
@@ -43,7 +43,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_exchange(
             obj.as_mut_ptr() as *mut c_void,
             desired.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
             ret.as_mut_ptr() as *mut c_void,
         )
     }
@@ -58,8 +58,8 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
             obj.as_mut_ptr() as *mut c_void,
             expected.as_mut_ptr() as *mut c_void,
             desired.as_ptr() as *const c_void,
-            succ as c_int,
-            fail as c_int,
+            succ.into(),
+            fail.into(),
         ) != 0
     }
 
@@ -73,8 +73,8 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
             obj.as_mut_ptr() as *mut c_void,
             expected.as_mut_ptr() as *mut c_void,
             desired.as_ptr() as *const c_void,
-            succ as c_int,
-            fail as c_int,
+            succ.into(),
+            fail.into(),
         ) != 0
     }
 
@@ -85,7 +85,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_test(
             obj.as_ptr() as *const c_void,
             offset as c_int,
-            ordering as c_int,
+            ordering.into(),
         ) != 0
     }
 
@@ -97,7 +97,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_test_compl(
             obj.as_mut_ptr() as *mut c_void,
             offset as c_int,
-            ordering as c_int,
+            ordering.into(),
         ) != 0
     }
 
@@ -109,7 +109,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_test_set(
             obj.as_mut_ptr() as *mut c_void,
             offset as c_int,
-            ordering as c_int,
+            ordering.into(),
         ) != 0
     }
 
@@ -121,7 +121,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_test_reset(
             obj.as_mut_ptr() as *mut c_void,
             offset as c_int,
-            ordering as c_int,
+            ordering.into(),
         ) != 0
     }
 
@@ -132,7 +132,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_or(
             obj.as_mut_ptr() as *mut c_void,
             arg.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
         )
     }
 
@@ -143,7 +143,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_xor(
             obj.as_mut_ptr() as *mut c_void,
             arg.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
         )
     }
 
@@ -154,7 +154,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_and(
             obj.as_mut_ptr() as *mut c_void,
             arg.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
         )
     }
 
@@ -164,7 +164,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         let fp_not = self.ffi_ops().binary_ops.fp_not.unwrap_unchecked();
         fp_not(
             obj.as_mut_ptr() as *mut c_void,
-            ordering as c_int,
+            ordering.into(),
         )
     }
 
@@ -177,7 +177,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_fetch_or(
             obj.as_mut_ptr() as *mut c_void,
             arg.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
             ret.as_mut_ptr() as *mut c_void,
         )
     }
@@ -191,7 +191,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_fetch_xor(
             obj.as_mut_ptr() as *mut c_void,
             arg.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
             ret.as_mut_ptr() as *mut c_void,
         )
     }
@@ -205,7 +205,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_fetch_and(
             obj.as_mut_ptr() as *mut c_void,
             arg.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
             ret.as_mut_ptr() as *mut c_void,
         )
     }
@@ -217,7 +217,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
             self.ffi_ops().binary_ops.fp_fetch_not.unwrap_unchecked();
         fp_fetch_not(
             obj.as_mut_ptr() as *mut c_void,
-            ordering as c_int,
+            ordering.into(),
             ret.as_mut_ptr() as *mut c_void,
         )
     }
@@ -229,7 +229,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_add(
             obj.as_mut_ptr() as *mut c_void,
             arg.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
         )
     }
 
@@ -240,7 +240,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_sub(
             obj.as_mut_ptr() as *mut c_void,
             arg.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
         )
     }
 
@@ -250,7 +250,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         let fp_inc = self.ffi_ops().arithmetic_ops.fp_inc.unwrap_unchecked();
         fp_inc(
             obj.as_mut_ptr() as *mut c_void,
-            ordering as c_int,
+            ordering.into(),
         )
     }
 
@@ -260,7 +260,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         let fp_dec = self.ffi_ops().arithmetic_ops.fp_dec.unwrap_unchecked();
         fp_dec(
             obj.as_mut_ptr() as *mut c_void,
-            ordering as c_int,
+            ordering.into(),
         )
     }
 
@@ -270,7 +270,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         let fp_neg = self.ffi_ops().arithmetic_ops.fp_neg.unwrap_unchecked();
         fp_neg(
             obj.as_mut_ptr() as *mut c_void,
-            ordering as c_int,
+            ordering.into(),
         )
     }
 
@@ -283,7 +283,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_fetch_add(
             obj.as_mut_ptr() as *mut c_void,
             arg.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
             ret.as_mut_ptr() as *mut c_void,
         )
     }
@@ -297,7 +297,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
         fp_fetch_sub(
             obj.as_mut_ptr() as *mut c_void,
             arg.as_ptr() as *const c_void,
-            ordering as c_int,
+            ordering.into(),
             ret.as_mut_ptr() as *mut c_void,
         )
     }
@@ -309,7 +309,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
             self.ffi_ops().arithmetic_ops.fp_fetch_inc.unwrap_unchecked();
         fp_fetch_inc(
             obj.as_mut_ptr() as *mut c_void,
-            ordering as c_int,
+            ordering.into(),
             ret.as_mut_ptr() as *mut c_void,
         )
     }
@@ -321,7 +321,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
             self.ffi_ops().arithmetic_ops.fp_fetch_dec.unwrap_unchecked();
         fp_fetch_dec(
             obj.as_mut_ptr() as *mut c_void,
-            ordering as c_int,
+            ordering.into(),
             ret.as_mut_ptr() as *mut c_void,
         )
     }
@@ -333,7 +333,7 @@ pub trait UncheckedExplicitOps: FfiOpsExplicit {
             self.ffi_ops().arithmetic_ops.fp_fetch_neg.unwrap_unchecked();
         fp_fetch_neg(
             obj.as_mut_ptr() as *mut c_void,
-            ordering as c_int,
+            ordering.into(),
             ret.as_mut_ptr() as *mut c_void,
         )
     }

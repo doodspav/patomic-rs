@@ -32,8 +32,18 @@ impl Ordering {
         )
     }
 
-    pub fn fail_ordering(&self) -> Ordering {
-        PATOMIC_CMPXCHG_FAIL_ORDER((*self) as c_int).into()
+    pub const fn fail_ordering(&self) -> Ordering {
+        let fail = PATOMIC_CMPXCHG_FAIL_ORDER((*self) as c_int);
+        #[allow(non_upper_case_globals)]
+        match fail {
+            patomic_RELAXED => Self::Relaxed,
+            patomic_CONSUME => Self::Consume,
+            patomic_ACQUIRE => Self::Acquire,
+            patomic_RELEASE => Self::Release,
+            patomic_ACQ_REL => Self::AcqRel,
+            patomic_SEQ_CST => Self::SeqCst,
+            _ => unreachable!(),
+        }
     }
 }
 
@@ -48,6 +58,20 @@ impl From<c_int> for Ordering {
             patomic_ACQ_REL => Self::AcqRel,
             patomic_SEQ_CST => Self::SeqCst,
             _ => Self::SeqCst,
+        }
+    }
+}
+
+impl From<Ordering> for c_int {
+    fn from(ordering: Ordering) -> Self {
+        #[allow(non_upper_case_globals)]
+        match ordering {
+            Ordering::Relaxed => patomic_RELAXED,
+            Ordering::Consume => patomic_CONSUME,
+            Ordering::Acquire => patomic_ACQUIRE,
+            Ordering::Release => patomic_RELEASE,
+            Ordering::AcqRel => patomic_ACQ_REL,
+            Ordering::SeqCst => patomic_SEQ_CST,
         }
     }
 }
