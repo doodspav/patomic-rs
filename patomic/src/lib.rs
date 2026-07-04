@@ -1,6 +1,8 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+#![no_std]
+
 mod align;
 mod backend;
 mod ordering;

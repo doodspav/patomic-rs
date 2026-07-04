@@ -10,8 +10,18 @@ readme = "README.md"
 description = "Safe bindings to the patomic C library."
 documentation = "https://docs.rs/patomic"
 repository = "https://github.com/doodspav/patomic-rs"
-categories = ["concurrency", "api-bindings"]
-keywords = ["patomic", "atomics", "concurrency"]
+categories = [
+    "concurrency",
+    "api-bindings",
+    "no-std",
+]
+keywords = [
+    "patomic",
+    "atomics",
+    "concurrency",
+    "lock-free",
+    "transactional-memory",
+]
 
 [dependencies]
 bitflags = "2.13.0"
