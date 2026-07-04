@@ -16,13 +16,6 @@ macro_rules! do_atomic_checks {
             );
         }
 
-        // check that atomic object is suitably aligned
-        if !$self.alignment().is_met_by($obj) {
-            return Err(
-                $crate::error::AtomicOpError::InvalidAlignment.into()
-            );
-        }
-
         // check that all objects have the expected width
         {
             let width = $self.width().get();
@@ -38,6 +31,13 @@ macro_rules! do_atomic_checks {
                     );
                 }
             )*
+        }
+
+        // check that atomic object is suitably aligned
+        if !$self.alignment().is_met_by($obj) {
+            return Err(
+                $crate::error::AtomicOpError::InvalidAlignment.into()
+            );
         }
     };
 }
