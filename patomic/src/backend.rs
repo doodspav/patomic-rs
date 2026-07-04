@@ -80,12 +80,35 @@ bitflags! {
     }
 }
 
+pub trait BackendInfo {
+    fn id(&self) -> Id;
+    fn kind(&self) -> Kind;
+    fn hint(&self) -> Hint;
+}
+
 #[derive(Debug, Copy, Clone)]
 pub struct AtomicBackend {
     width: NonZeroUsize,
     alignment: Alignment,
     ops: patomic_ops_t,
     ops_explicit: patomic_ops_explicit_t,
+    id: Id,
+    kind: Kind,
+    hint: Hint,
+}
+
+impl BackendInfo for AtomicBackend {
+    fn id(&self) -> Id {
+        self.id
+    }
+
+    fn kind(&self) -> Kind {
+        self.kind
+    }
+
+    fn hint(&self) -> Hint {
+        self.hint
+    }
 }
 
 impl AtomicLayout for AtomicBackend {
@@ -119,6 +142,23 @@ impl ExplicitOps for AtomicBackend {}
 #[derive(Debug, Copy, Clone)]
 pub struct TransactionBackend {
     ops_transaction: patomic_ops_transaction_t,
+    id: Id,
+    kind: Kind,
+    hint: Hint,
+}
+
+impl BackendInfo for TransactionBackend {
+    fn id(&self) -> Id {
+        self.id
+    }
+
+    fn kind(&self) -> Kind {
+        self.kind
+    }
+
+    fn hint(&self) -> Hint {
+        self.hint
+    }
 }
 
 unsafe impl FfiOpsTransaction for TransactionBackend {
