@@ -8,6 +8,7 @@ use patomic_sys::*;
 use crate::align::{Alignment, AtomicLayout};
 use crate::ops::*;
 
+#[derive(Debug, Copy, Clone)]
 pub struct AtomicBackend {
     width: NonZeroUsize,
     alignment: Alignment,
@@ -43,6 +44,7 @@ impl UncheckedExplicitOps for AtomicBackend {}
 impl ImplicitOps for AtomicBackend {}
 impl ExplicitOps for AtomicBackend {}
 
+#[derive(Debug, Copy, Clone)]
 pub struct TransactionBackend {
     ops_transaction: patomic_ops_transaction_t,
 }
