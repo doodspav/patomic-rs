@@ -64,6 +64,52 @@ pub trait TransactionOps: UncheckedTransactionOps {
         })
     }
 
+    fn bit_test_transaction(
+        &self, obj: SharedBytesRef, offset: usize, config: TransactionConfig
+    ) -> TransactionBitwiseOpResult<(bool, TransactionOutcome)> {
+        do_transaction_checks_bit_test!(
+            self.ffi_ops().bitwise_ops, fp_test, config,
+            obj; offset
+        );
+        Ok(unsafe { self.unchecked_bit_test_transaction(obj, offset, config) })
+    }
+
+    fn bit_test_compl_transaction(
+        &self, obj: SharedBytesRef, offset: usize, config: TransactionConfig
+    ) -> TransactionBitwiseOpResult<(bool, TransactionOutcome)> {
+        do_transaction_checks_bit_test!(
+            self.ffi_ops().bitwise_ops, fp_test_compl, config,
+            obj; offset
+        );
+        Ok(unsafe {
+            self.unchecked_bit_test_compl_transaction(obj, offset, config)
+        })
+    }
+
+    fn bit_test_set_transaction(
+        &self, obj: SharedBytesRef, offset: usize, config: TransactionConfig
+    ) -> TransactionBitwiseOpResult<(bool, TransactionOutcome)> {
+        do_transaction_checks_bit_test!(
+            self.ffi_ops().bitwise_ops, fp_test_set, config,
+            obj; offset
+        );
+        Ok(unsafe {
+            self.unchecked_bit_test_set_transaction(obj, offset, config)
+        })
+    }
+
+    fn bit_test_reset_transaction(
+        &self, obj: SharedBytesRef, offset: usize, config: TransactionConfig
+    ) -> TransactionBitwiseOpResult<(bool, TransactionOutcome)> {
+        do_transaction_checks_bit_test!(
+            self.ffi_ops().bitwise_ops, fp_test_reset, config,
+            obj; offset
+        );
+        Ok(unsafe {
+            self.unchecked_bit_test_reset_transaction(obj, offset, config)
+        })
+    }
+
     fn flag_test(
         &self, flag: SharedFlagRef
     ) -> TransactionUnsupportedOpResult<bool> {
