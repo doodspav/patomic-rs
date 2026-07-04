@@ -459,6 +459,7 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().special_ops.fp_generic.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         let mut closure = ManuallyDrop::new(closure);
+        let width = config.width;
 
         fp_generic(
             Some(call_closure::<F>),
@@ -468,9 +469,10 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         );
 
         let outcome: TransactionOutcome = outcome.assume_init().into();
-        if outcome.status.exit_code != TransactionExitCode::Success {
+        let is_closure_called = width != 0
+            && outcome.status.exit_code == TransactionExitCode::Success;
+        if !is_closure_called {
             ManuallyDrop::drop(&mut closure);
-            // todo: also drop when width == 0
         }
         outcome
     }
@@ -483,6 +485,7 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let mut outcome = MaybeUninit::uninit();
         let mut closure = ManuallyDrop::new(closure);
         let mut fallback_closure = ManuallyDrop::new(fallback_closure);
+        let width = config.width;
 
         fp_generic_wfb(
             Some(call_closure::<F>),
@@ -494,11 +497,15 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         );
 
         let outcome: TransactionOutcomeWfb = outcome.assume_init().into();
-        // todo: also drop both when width == 0 (or fallback not attempted)
-        if outcome.status.exit_code != TransactionExitCode::Success {
+        let is_closure_called = width != 0
+            && outcome.status.exit_code == TransactionExitCode::Success;
+        let is_fallback_closure_called = width != 0
+            && outcome.status.exit_code != TransactionExitCode::Success
+            && outcome.fallback_status.exit_code == TransactionExitCode::Success;
+        if !is_closure_called {
             ManuallyDrop::drop(&mut closure);
         }
-        if outcome.fallback_status.exit_code != TransactionExitCode::Success {
+        if !is_fallback_closure_called {
             ManuallyDrop::drop(&mut fallback_closure);
         }
         outcome
