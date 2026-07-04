@@ -81,9 +81,9 @@ bitflags! {
 }
 
 pub trait BackendInfo {
-    fn id(&self) -> Id;
-    fn kind(&self) -> Kind;
-    fn hint(&self) -> Hint;
+    fn ids(&self) -> Id;
+    fn kinds(&self) -> Kind;
+    fn hints(&self) -> Hint;
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -92,22 +92,22 @@ pub struct AtomicBackend {
     alignment: Alignment,
     ops: patomic_ops_t,
     ops_explicit: patomic_ops_explicit_t,
-    id: Id,
-    kind: Kind,
-    hint: Hint,
+    ids: Id,
+    kinds: Kind,
+    hints: Hint,
 }
 
 impl BackendInfo for AtomicBackend {
-    fn id(&self) -> Id {
-        self.id
+    fn ids(&self) -> Id {
+        self.ids
     }
 
-    fn kind(&self) -> Kind {
-        self.kind
+    fn kinds(&self) -> Kind {
+        self.kinds
     }
 
-    fn hint(&self) -> Hint {
-        self.hint
+    fn hints(&self) -> Hint {
+        self.hints
     }
 }
 
@@ -142,22 +142,22 @@ impl ExplicitOps for AtomicBackend {}
 #[derive(Debug, Copy, Clone)]
 pub struct TransactionBackend {
     ops_transaction: patomic_ops_transaction_t,
-    id: Id,
-    kind: Kind,
-    hint: Hint,
+    ids: Id,
+    kinds: Kind,
+    hints: Hint,
 }
 
 impl BackendInfo for TransactionBackend {
-    fn id(&self) -> Id {
-        self.id
+    fn ids(&self) -> Id {
+        self.ids
     }
 
-    fn kind(&self) -> Kind {
-        self.kind
+    fn kinds(&self) -> Kind {
+        self.kinds
     }
 
-    fn hint(&self) -> Hint {
-        self.hint
+    fn hints(&self) -> Hint {
+        self.hints
     }
 }
 
