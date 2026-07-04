@@ -4,10 +4,10 @@
 #![no_std]
 
 mod align;
-mod backend;
 mod ordering;
 mod shared;
 
+pub mod backend;
 pub mod error;
 pub mod ops;
 pub mod transaction;
