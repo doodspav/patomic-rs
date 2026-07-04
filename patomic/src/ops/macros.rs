@@ -69,8 +69,8 @@ macro_rules! do_transaction_checks {
         $ops:expr,
         $fp:ident,
         $config:ident,
-        $obj:ident
-        $(, $bytes:ident)* $(,)?
+        $obj:expr
+        $(, $bytes:expr)* $(,)?
     ) => {
         // check that operation is supported
         if $ops.$fp.is_none() {

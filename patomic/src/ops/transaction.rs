@@ -1,13 +1,9 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use crate::{SharedBytesRef, SharedFlagRef, transaction::*};
+use crate::{SharedBytesRef, SharedFlagRef, transaction::*, TransactionError};
 
-use crate::error::{
-    TransactionOpResult,
-    TransactionBitwiseOpResult,
-    TransactionUnsupportedOpError, TransactionUnsupportedOpResult,
-};
+use crate::error::{TransactionOpResult, TransactionBitwiseOpResult, TransactionUnsupportedOpError, TransactionUnsupportedOpResult, TransactionOpError};
 
 use crate::ops::UncheckedTransactionOps;
 use crate::ops::macros::{
@@ -311,12 +307,68 @@ pub trait TransactionOps: UncheckedTransactionOps {
         })
     }
 
+    fn double_cmpxchg_transaction(
+        &self, cxa: CmpxchgOperands, cxb: CmpxchgOperands,
+        config: TransactionConfigWfb
+    ) -> TransactionOpResult<TransactionOutcomeWfb> {
+        do_transaction_checks!(
+            self.ffi_ops().special_ops, fp_double_cmpxchg, config,
+            cxa.obj, cxa.expected, cxa.desired,
+            cxb.obj, cxb.expected, cxb.desired,
+        );
+        Ok(unsafe {
+            self.unchecked_double_cmpxchg_transaction(cxa, cxb, config)
+        })
+    }
+
+    fn multi_cmpxchg_transaction(
+        &self, cxs: &[CmpxchgOperands], config: TransactionConfigWfb
+    ) -> TransactionOpResult<TransactionOutcomeWfb> {
+        if self.ffi_ops().special_ops.fp_multi_cmpxchg.is_none() {
+            return Err(TransactionOpError::UnsupportedOperation);
+        }
+        for cx in cxs {
+            if cx.obj.len() != config.width
+                || cx.expected.len() != config.width
+                || cx.desired.len() != config.width {
+                return Err(TransactionOpError::InvalidSize);
+            }
+        }
+        Ok(unsafe {
+            self.unchecked_multi_cmpxchg_transaction(cxs, config)
+        })
+    }
+
+    fn generic_transaction<F: FnOnce()>(
+        &self, closure: F, config: TransactionConfig
+    ) -> TransactionUnsupportedOpResult<TransactionOutcome> {
+        if self.ffi_ops().special_ops.fp_generic.is_none() {
+            return Err(TransactionUnsupportedOpError)
+        }
+        Ok(unsafe {
+            self.unchecked_generic_transaction(closure, config)
+        })
+    }
+
+    fn generic_wfb_transaction<F: FnOnce(), G: FnOnce()>(
+        &self, closure: F, fallback_closure: G, config: TransactionConfigWfb
+    ) -> TransactionUnsupportedOpResult<TransactionOutcomeWfb> {
+        if self.ffi_ops().special_ops.fp_generic_wfb.is_none() {
+            return Err(TransactionUnsupportedOpError)
+        }
+        Ok(unsafe {
+            self.unchecked_generic_wfb_transaction(
+                closure, fallback_closure, config
+            )
+        })
+    }
+
     fn flag_test(
         &self, flag: SharedFlagRef
     ) -> TransactionUnsupportedOpResult<bool> {
         if self.ffi_ops().flag_ops.fp_test.is_none() {
             return Err(TransactionUnsupportedOpError)
-        };
+        }
         Ok(unsafe { self.unchecked_flag_test(flag) })
     }
 
@@ -325,7 +377,7 @@ pub trait TransactionOps: UncheckedTransactionOps {
     ) -> TransactionUnsupportedOpResult<bool> {
         if self.ffi_ops().flag_ops.fp_test_set.is_none() {
             return Err(TransactionUnsupportedOpError)
-        };
+        }
         Ok(unsafe { self.unchecked_flag_test_set(flag) })
     }
 
@@ -334,7 +386,7 @@ pub trait TransactionOps: UncheckedTransactionOps {
     ) -> TransactionUnsupportedOpResult<()> {
         if self.ffi_ops().flag_ops.fp_clear.is_none() {
             return Err(TransactionUnsupportedOpError)
-        };
+        }
         Ok(unsafe { self.unchecked_flag_clear(flag) })
     }
 }
