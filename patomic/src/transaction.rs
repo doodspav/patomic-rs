@@ -58,6 +58,7 @@ pub struct TransactionStatus {
 
 impl TransactionStatus {
     pub const fn from_ffi(status: c_ulong) -> Self {
+        #[allow(non_upper_case_globals)]
         let exit_code = match PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status) {
             patomic_TSUCCESS => TransactionExitCode::Success,
             patomic_TABORT_EXPLICIT => TransactionExitCode::AbortExplicit {

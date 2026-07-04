@@ -165,7 +165,7 @@ impl core::fmt::Display for TransactionUnsupportedOpError {
     }
 }
 
-impl std::error::Error for TransactionUnsupportedOpError {}
+impl core::error::Error for TransactionUnsupportedOpError {}
 
 impl From<TransactionUnsupportedOpError> for TransactionOpError {
     fn from(_: TransactionUnsupportedOpError) -> Self {

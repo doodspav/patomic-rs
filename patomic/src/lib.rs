@@ -5,10 +5,10 @@ mod align;
 mod backend;
 mod ordering;
 mod shared;
-mod transaction;
 
 pub mod error;
 pub mod ops;
+pub mod transaction;
 
 pub use align::{Alignment, AtomicLayout};
 pub use backend::{AtomicBackend, TransactionBackend};

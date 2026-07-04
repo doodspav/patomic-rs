@@ -39,6 +39,7 @@ impl Ordering {
 
 impl From<c_int> for Ordering {
     fn from(ordering: c_int) -> Self {
+        #[allow(non_upper_case_globals)]
         match ordering {
             patomic_RELAXED => Self::Relaxed,
             patomic_CONSUME => Self::Consume,
