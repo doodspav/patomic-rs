@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 mod align;
+mod backend;
 mod ordering;
 mod shared;
 mod transaction;
@@ -10,6 +11,7 @@ pub mod error;
 pub mod ops;
 
 pub use align::{Alignment, AtomicLayout};
+pub use backend::{AtomicBackend, TransactionBackend};
 pub use error::{
     AtomicError, AtomicResult,
     TransactionError, TransactionResult,
