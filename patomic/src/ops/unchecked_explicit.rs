@@ -8,7 +8,7 @@ use patomic_sys::*;
 use crate::{Ordering, SharedBytesRef};
 
 pub unsafe trait FfiOpsExplicit {
-    fn ffi_ops(&self) -> patomic_ops_explicit_t;
+    fn ffi_ops(&self) -> &patomic_ops_explicit_t;
 }
 
 pub trait UncheckedExplicitOps: FfiOpsExplicit {

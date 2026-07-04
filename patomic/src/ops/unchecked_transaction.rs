@@ -12,7 +12,7 @@ extern "C" fn call_closure<F: FnOnce()>(ctx: *mut c_void) {
 }
 
 pub unsafe trait FfiOpsTransaction {
-    fn ffi_ops(&self) -> patomic_ops_transaction_t;
+    fn ffi_ops(&self) -> &patomic_ops_transaction_t;
 }
 
 pub trait UncheckedTransactionOps: FfiOpsTransaction {
