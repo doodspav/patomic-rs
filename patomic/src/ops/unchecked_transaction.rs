@@ -64,35 +64,18 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
     unsafe fn unchecked_compare_exchange_weak_transaction(
         &self, obj: SharedBytesRef, expected: &mut [u8], desired: &[u8],
         config: TransactionConfigWfb
-    ) -> TransactionOutcomeWfb {
+    ) -> (bool, TransactionOutcomeWfb) {
         let fp_cmpxchg_weak =
             self.ffi_ops().xchg_ops.fp_cmpxchg_weak.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
-        fp_cmpxchg_weak(
+        let ok = fp_cmpxchg_weak(
             obj.as_mut_ptr() as *mut c_void,
             expected.as_mut_ptr() as *mut c_void,
             desired.as_ptr() as *const c_void,
             config.into(),
             outcome.as_mut_ptr(),
-        );
-        outcome.assume_init().into()
-    }
-
-    unsafe fn unchecked_compare_exchange_strong_transaction(
-        &self, obj: SharedBytesRef, expected: &mut [u8], desired: &[u8],
-        config: TransactionConfigWfb
-    ) -> TransactionOutcomeWfb {
-        let fp_cmpxchg_strong =
-            self.ffi_ops().xchg_ops.fp_cmpxchg_strong.unwrap_unchecked();
-        let mut outcome = MaybeUninit::uninit();
-        fp_cmpxchg_strong(
-            obj.as_mut_ptr() as *mut c_void,
-            expected.as_mut_ptr() as *mut c_void,
-            desired.as_ptr() as *const c_void,
-            config.into(),
-            outcome.as_mut_ptr(),
-        );
-        outcome.assume_init().into()
+        ) != 0;
+        (ok, outcome.assume_init().into())
     }
 
     unsafe fn unchecked_bit_test_transaction(
