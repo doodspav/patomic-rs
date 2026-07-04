@@ -110,6 +110,95 @@ pub trait TransactionOps: UncheckedTransactionOps {
         })
     }
 
+    fn or_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().binary_ops, fp_or, config,
+            obj, arg,
+        );
+        Ok(unsafe { self.unchecked_or_transaction(obj, arg, config) })
+    }
+
+    fn xor_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().binary_ops, fp_xor, config,
+            obj, arg,
+        );
+        Ok(unsafe { self.unchecked_xor_transaction(obj, arg, config) })
+    }
+
+    fn and_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().binary_ops, fp_and, config,
+            obj, arg,
+        );
+        Ok(unsafe { self.unchecked_and_transaction(obj, arg, config) })
+    }
+
+    fn not_transaction(
+        &self, obj: SharedBytesRef, config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().binary_ops, fp_not, config,
+            obj,
+        );
+        Ok(unsafe { self.unchecked_not_transaction(obj, config) })
+    }
+
+    fn fetch_or_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], ret: &mut [u8],
+        config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().binary_ops, fp_fetch_or, config,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            self.unchecked_fetch_or_transaction(obj, arg, ret, config)
+        })
+    }
+
+    fn fetch_xor_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], ret: &mut [u8],
+        config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().binary_ops, fp_fetch_xor, config,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            self.unchecked_fetch_xor_transaction(obj, arg, ret, config)
+        })
+    }
+
+    fn fetch_and_transaction(
+        &self, obj: SharedBytesRef, arg: &[u8], ret: &mut [u8],
+        config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().binary_ops, fp_fetch_and, config,
+            obj, arg, ret,
+        );
+        Ok(unsafe {
+            self.unchecked_fetch_and_transaction(obj, arg, ret, config)
+        })
+    }
+
+    fn fetch_not_transaction(
+        &self, obj: SharedBytesRef, ret: &mut [u8], config: TransactionConfig
+    ) -> TransactionOpResult<TransactionOutcome> {
+        do_transaction_checks!(
+            self.ffi_ops().binary_ops, fp_fetch_or, config,
+            obj, ret,
+        );
+        Ok(unsafe { self.unchecked_fetch_not_transaction(obj, ret, config) })
+    }
+
     fn flag_test(
         &self, flag: SharedFlagRef
     ) -> TransactionUnsupportedOpResult<bool> {
