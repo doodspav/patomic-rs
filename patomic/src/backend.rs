@@ -8,7 +8,7 @@ use bitflags::bitflags;
 
 use patomic_sys::*;
 
-use crate::align::{Alignment, AtomicLayout};
+use crate::{Alignment, AtomicLayout, Ordering};
 use crate::ops::*;
 
 // todo: document that new ids may be added as a minor change
@@ -84,6 +84,118 @@ pub trait BackendInfo {
     fn ids(&self) -> Id;
     fn kinds(&self) -> Kind;
     fn hints(&self) -> Hint;
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct AtomicBackendBuilder {
+    width: NonZeroUsize,
+    ordering: Ordering,
+    ids: Id,
+    kinds: Kind,
+    hints: Hint,
+}
+
+impl AtomicBackendBuilder {
+    const fn new(width: NonZeroUsize) -> Self {
+        Self {
+            width,
+            ordering: Ordering::SeqCst,
+            ids: Id::ALL,
+            kinds: Kind::all(),
+            hints: Hint::NONE,
+        }
+    }
+
+    const fn implicit_ordering(mut self, ordering: Ordering) -> Self {
+        self.ordering = ordering;
+        self
+    }
+
+    const fn ids(mut self, ids: Id) -> Self {
+        self.ids = ids;
+        self
+    }
+
+    const fn kinds(mut self, kinds: Kind) -> Self {
+        self.kinds = kinds;
+        self
+    }
+
+    const fn hints(mut self, hints: Hint) -> Self {
+        self.hints = hints;
+        self
+    }
+
+    pub fn build(self) -> AtomicBackend {
+        let imp = unsafe { patomic_create(
+            self.width.get(),
+            self.ordering.into(),
+            self.hints.bits() as c_uint,
+            self.kinds.bits() as c_uint,
+            self.ids.bits() as c_ulong,
+        ) };
+        let exp = unsafe { patomic_create_explicit(
+            self.width.get(),
+            self.hints.bits() as c_uint,
+            self.kinds.bits() as c_uint,
+            self.ids.bits() as c_ulong,
+        ) };
+        AtomicBackend {
+            width: self.width,
+            alignment: imp.align.into(),
+            ops: imp.ops,
+            ops_explicit: exp.ops,
+            ids: self.ids,
+            kinds: self.kinds,
+            hints: self.hints,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct TransactionBackendBuilder {
+    ids: Id,
+    kinds: Kind,
+    hints: Hint,
+}
+
+impl TransactionBackendBuilder {
+    const fn new() -> Self {
+        Self {
+            ids: Id::ALL,
+            kinds: Kind::all(),
+            hints: Hint::NONE,
+        }
+    }
+
+    const fn ids(mut self, ids: Id) -> Self {
+        self.ids = ids;
+        self
+    }
+
+    const fn kinds(mut self, kinds: Kind) -> Self {
+        self.kinds = kinds;
+        self
+    }
+
+    const fn hints(mut self, hints: Hint) -> Self {
+        self.hints = hints;
+        self
+    }
+
+    pub fn build(self) -> TransactionBackend {
+        let tsx = unsafe { patomic_create_transaction(
+            self.hints.bits() as c_uint,
+            self.kinds.bits() as c_uint,
+            self.ids.bits() as c_ulong,
+        ) };
+        TransactionBackend {
+            ops_transaction: tsx.ops,
+            ids: self.ids,
+            kinds: self.kinds,
+            hints: self.hints,
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone)]

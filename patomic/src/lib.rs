@@ -13,7 +13,10 @@ pub mod ops;
 pub mod transaction;
 
 pub use align::{Alignment, AtomicLayout};
-pub use backend::{AtomicBackend, TransactionBackend};
+pub use backend::{
+    AtomicBackend, AtomicBackendBuilder,
+    TransactionBackend, TransactionBackendBuilder,
+};
 pub use error::{
     AtomicError, AtomicResult,
     TransactionError, TransactionResult,
