@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use core::ffi::{c_int, c_void};
-use core::mem::MaybeUninit;
-
+use core::mem::{ManuallyDrop, MaybeUninit};
 use patomic_sys::*;
 
 use crate::{SharedBytesRef, SharedFlagRef, transaction::*};
+
+extern "C" fn call_closure<F: FnOnce()>(ctx: *mut c_void) {
+    unsafe { ctx.cast::<F>().read()() }
+}
 
 pub unsafe trait FfiOpsTransaction {
     fn ffi_ops(&self) -> patomic_ops_transaction_t;
@@ -416,6 +419,89 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             outcome.as_mut_ptr(),
         );
         outcome.assume_init().into()
+    }
+
+    unsafe fn unchecked_double_cmpxchg_transaction(
+        &self, cxa: CmpxchgOperands, cxb: CmpxchgOperands,
+        config: TransactionConfigWfb
+    ) -> TransactionOutcomeWfb {
+        let fp_double_cmpxchg =
+            self.ffi_ops().special_ops.fp_double_cmpxchg.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        fp_double_cmpxchg(
+            cxa.into(),
+            cxb.into(),
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+        outcome.assume_init().into()
+    }
+
+    unsafe fn unchecked_multi_cmpxchg_transaction(
+        &self, cxs: &[CmpxchgOperands], config: TransactionConfigWfb
+    ) -> TransactionOutcomeWfb {
+        let fp_multi_cmpxchg =
+            self.ffi_ops().special_ops.fp_multi_cmpxchg.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        fp_multi_cmpxchg(
+            cxs.as_ptr() as *const patomic_transaction_cmpxchg_t,
+            cxs.len(),
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+        outcome.assume_init().into()
+    }
+
+    unsafe fn unchecked_generic_transaction<F: FnOnce()>(
+        &self, closure: F, config: TransactionConfig
+    ) -> TransactionOutcome {
+        let fp_generic =
+            self.ffi_ops().special_ops.fp_generic.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        let mut closure = ManuallyDrop::new(closure);
+
+        fp_generic(
+            Some(call_closure::<F>),
+            (&raw mut closure).cast(),
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+
+        let outcome: TransactionOutcome = outcome.assume_init().into();
+        if outcome.status.exit_code != TransactionExitCode::Success {
+            ManuallyDrop::drop(&mut closure);
+            // todo: also drop when width == 0
+        }
+        outcome
+    }
+
+    unsafe fn unchecked_generic_wfb_transaction<F: FnOnce(), G: FnOnce()>(
+        &self, closure: F, fallback_closure: G, config: TransactionConfigWfb
+    ) -> TransactionOutcomeWfb {
+        let fp_generic_wfb =
+            self.ffi_ops().special_ops.fp_generic_wfb.unwrap_unchecked();
+        let mut outcome = MaybeUninit::uninit();
+        let mut closure = ManuallyDrop::new(closure);
+        let mut fallback_closure = ManuallyDrop::new(fallback_closure);
+
+        fp_generic_wfb(
+            Some(call_closure::<F>),
+            (&raw mut closure).cast(),
+            Some(call_closure::<G>),
+            (&raw mut fallback_closure).cast(),
+            config.into(),
+            outcome.as_mut_ptr(),
+        );
+
+        let outcome: TransactionOutcomeWfb = outcome.assume_init().into();
+        // todo: also drop both when width == 0 (or fallback not attempted)
+        if outcome.status.exit_code != TransactionExitCode::Success {
+            ManuallyDrop::drop(&mut closure);
+        }
+        if outcome.fallback_status.exit_code != TransactionExitCode::Success {
+            ManuallyDrop::drop(&mut fallback_closure);
+        }
+        outcome
     }
 
     unsafe fn unchecked_flag_test(&self, flag: SharedFlagRef) -> bool {
