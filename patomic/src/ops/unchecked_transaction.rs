@@ -22,8 +22,8 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_store = self.ffi_ops().fp_store.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_store(
-            obj.as_mut_ptr() as *mut c_void,
-            desired.as_ptr() as *const c_void,
+            obj.as_mut_ptr().cast(),
+            desired.as_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -36,8 +36,8 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_load = self.ffi_ops().fp_load.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_load(
-            obj.as_mut_ptr() as *mut c_void,
-            ret.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
+            ret.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -52,9 +52,9 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().xchg_ops.fp_exchange.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_exchange(
-            obj.as_mut_ptr() as *mut c_void,
-            desired.as_ptr() as *const c_void,
-            ret.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
+            desired.as_ptr().cast(),
+            ret.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -69,9 +69,9 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().xchg_ops.fp_cmpxchg_weak.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         let ok = fp_cmpxchg_weak(
-            obj.as_mut_ptr() as *mut c_void,
-            expected.as_mut_ptr() as *mut c_void,
-            desired.as_ptr() as *const c_void,
+            obj.as_mut_ptr().cast(),
+            expected.as_mut_ptr().cast(),
+            desired.as_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         ) != 0;
@@ -84,7 +84,7 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_test = self.ffi_ops().bitwise_ops.fp_test.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         let bit = fp_test(
-            obj.as_mut_ptr() as *const c_void,
+            obj.as_mut_ptr().cast(),
             offset as c_int,
             config.into(),
             outcome.as_mut_ptr(),
@@ -99,7 +99,7 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().bitwise_ops.fp_test_compl.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         let bit = fp_test_compl(
-            obj.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
             offset as c_int,
             config.into(),
             outcome.as_mut_ptr(),
@@ -114,7 +114,7 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().bitwise_ops.fp_test_set.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         let bit = fp_test_set(
-            obj.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
             offset as c_int,
             config.into(),
             outcome.as_mut_ptr(),
@@ -129,7 +129,7 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().bitwise_ops.fp_test_reset.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         let bit = fp_test_reset(
-            obj.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
             offset as c_int,
             config.into(),
             outcome.as_mut_ptr(),
@@ -143,8 +143,8 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_or = self.ffi_ops().binary_ops.fp_or.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_or(
-            obj.as_mut_ptr() as *mut c_void,
-            arg.as_ptr() as *const c_void,
+            obj.as_mut_ptr().cast(),
+            arg.as_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -157,8 +157,8 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_xor = self.ffi_ops().binary_ops.fp_xor.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_xor(
-            obj.as_mut_ptr() as *mut c_void,
-            arg.as_ptr() as *const c_void,
+            obj.as_mut_ptr().cast(),
+            arg.as_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -171,8 +171,8 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_and = self.ffi_ops().binary_ops.fp_and.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_and(
-            obj.as_mut_ptr() as *mut c_void,
-            arg.as_ptr() as *const c_void,
+            obj.as_mut_ptr().cast(),
+            arg.as_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -185,7 +185,7 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_not = self.ffi_ops().binary_ops.fp_not.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_not(
-            obj.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -200,9 +200,9 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().binary_ops.fp_fetch_or.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_fetch_or(
-            obj.as_mut_ptr() as *mut c_void,
-            arg.as_ptr() as *const c_void,
-            ret.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
+            arg.as_ptr().cast(),
+            ret.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -217,9 +217,9 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().binary_ops.fp_fetch_xor.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_fetch_xor(
-            obj.as_mut_ptr() as *mut c_void,
-            arg.as_ptr() as *const c_void,
-            ret.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
+            arg.as_ptr().cast(),
+            ret.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -234,9 +234,9 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().binary_ops.fp_fetch_and.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_fetch_and(
-            obj.as_mut_ptr() as *mut c_void,
-            arg.as_ptr() as *const c_void,
-            ret.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
+            arg.as_ptr().cast(),
+            ret.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -250,8 +250,8 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().binary_ops.fp_fetch_not.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_fetch_not(
-            obj.as_mut_ptr() as *mut c_void,
-            ret.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
+            ret.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -264,8 +264,8 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_add = self.ffi_ops().arithmetic_ops.fp_add.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_add(
-            obj.as_mut_ptr() as *mut c_void,
-            arg.as_ptr() as *const c_void,
+            obj.as_mut_ptr().cast(),
+            arg.as_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -278,8 +278,8 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_sub = self.ffi_ops().arithmetic_ops.fp_sub.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_sub(
-            obj.as_mut_ptr() as *mut c_void,
-            arg.as_ptr() as *const c_void,
+            obj.as_mut_ptr().cast(),
+            arg.as_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -292,7 +292,7 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_inc = self.ffi_ops().arithmetic_ops.fp_inc.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_inc(
-            obj.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -305,7 +305,7 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_dec = self.ffi_ops().arithmetic_ops.fp_dec.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_dec(
-            obj.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -318,7 +318,7 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_neg = self.ffi_ops().arithmetic_ops.fp_neg.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_neg(
-            obj.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -333,9 +333,9 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().arithmetic_ops.fp_fetch_add.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_fetch_add(
-            obj.as_mut_ptr() as *mut c_void,
-            arg.as_ptr() as *const c_void,
-            ret.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
+            arg.as_ptr().cast(),
+            ret.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -350,9 +350,9 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().arithmetic_ops.fp_fetch_sub.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_fetch_sub(
-            obj.as_mut_ptr() as *mut c_void,
-            arg.as_ptr() as *const c_void,
-            ret.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
+            arg.as_ptr().cast(),
+            ret.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -366,8 +366,8 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().arithmetic_ops.fp_fetch_inc.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_fetch_inc(
-            obj.as_mut_ptr() as *mut c_void,
-            ret.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
+            ret.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -381,8 +381,8 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().arithmetic_ops.fp_fetch_dec.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_fetch_dec(
-            obj.as_mut_ptr() as *mut c_void,
-            ret.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
+            ret.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -396,8 +396,8 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().arithmetic_ops.fp_fetch_neg.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_fetch_neg(
-            obj.as_mut_ptr() as *mut c_void,
-            ret.as_mut_ptr() as *mut c_void,
+            obj.as_mut_ptr().cast(),
+            ret.as_mut_ptr().cast(),
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -427,7 +427,7 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
             self.ffi_ops().special_ops.fp_multi_cmpxchg.unwrap_unchecked();
         let mut outcome = MaybeUninit::uninit();
         fp_multi_cmpxchg(
-            cxs.as_ptr() as *const patomic_transaction_cmpxchg_t,
+            cxs.as_ptr().cast(),
             cxs.len(),
             config.into(),
             outcome.as_mut_ptr(),
@@ -496,17 +496,17 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
 
     unsafe fn unchecked_flag_test(&self, flag: SharedFlagRef) -> bool {
         let fp_test = self.ffi_ops().flag_ops.fp_test.unwrap_unchecked();
-        fp_test(flag.as_ptr() as *const patomic_transaction_flag_t) != 0
+        fp_test(flag.as_ptr().cast()) != 0
     }
     
     unsafe fn unchecked_flag_test_set(&self, flag: SharedFlagRef) -> bool {
         let fp_test_set = 
             self.ffi_ops().flag_ops.fp_test_set.unwrap_unchecked();
-        fp_test_set(flag.as_mut_ptr() as *mut patomic_transaction_flag_t) != 0
+        fp_test_set(flag.as_mut_ptr().cast()) != 0
     }
     
     unsafe fn unchecked_flag_clear(&self, flag: SharedFlagRef) {
         let fp_clear = self.ffi_ops().flag_ops.fp_clear.unwrap_unchecked();
-        fp_clear(flag.as_mut_ptr() as *mut patomic_transaction_flag_t)
+        fp_clear(flag.as_mut_ptr().cast())
     }
 }

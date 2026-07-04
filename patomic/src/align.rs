@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use core::cmp::Ordering;
-use core::ffi::c_void;
 use core::num::NonZeroUsize;
 
 use patomic_sys::*;
@@ -23,7 +22,7 @@ pub struct Alignment {
 
 impl Alignment {
     pub fn is_met_by(&self, bytes: SharedBytesRef) -> bool {
-        let ptr = bytes.as_ptr() as *const c_void;
+        let ptr = bytes.as_ptr().cast();
         let align = (*self).into();
         let Some(width) = NonZeroUsize::new(bytes.len()) else {
             return false;

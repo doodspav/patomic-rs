@@ -1,7 +1,7 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use core::ffi::{c_ulong, c_void};
+use core::ffi::c_ulong;
 use core::cell::UnsafeCell;
 
 use bitflags::bitflags;
@@ -123,9 +123,9 @@ pub struct CmpxchgOperands<'a> {
 impl From<CmpxchgOperands<'_>> for patomic_transaction_cmpxchg_t {
     fn from(value: CmpxchgOperands<'_>) -> Self {
         Self {
-            obj: value.obj.as_mut_ptr() as *mut c_void,
-            expected: value.expected.as_mut_ptr() as *mut c_void,
-            desired: value.desired.as_ptr() as *const c_void,
+            obj: value.obj.as_mut_ptr().cast(),
+            expected: value.expected.as_mut_ptr().cast(),
+            desired: value.desired.as_ptr().cast(),
         }
     }
 }
