@@ -28,6 +28,10 @@ impl Id {
 pub struct SingleId(Id);
 
 impl SingleId {
+    pub const NULL: Self = Self::new(Id::NULL).unwrap();
+    pub const STDC: Self = Self::new(Id::NULL).unwrap();
+    pub const MSVC: Self = Self::new(Id::NULL).unwrap();
+
     pub const fn new(id: Id) -> Option<Self> {
         if id.bits().count_ones() <= 1 {
             Some(Self(id))
