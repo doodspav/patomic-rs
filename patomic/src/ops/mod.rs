@@ -5,9 +5,9 @@ mod unchecked_implicit;
 mod unchecked_explicit;
 mod unchecked_transaction;
 
-pub use unchecked_implicit::*;
-pub use unchecked_explicit::*;
-pub use unchecked_transaction::*;
+pub use unchecked_implicit::{FfiOpsImplicit, UncheckedImplicitOps};
+pub use unchecked_explicit::{FfiOpsExplicit, UncheckedExplicitOps};
+pub use unchecked_transaction::{FfiOpsTransaction, UncheckedTransactionOps};
 
 pub(crate) mod macros;
 
@@ -15,6 +15,6 @@ mod implicit;
 mod explicit;
 mod transaction;
 
-pub use implicit::*;
-pub use explicit::*;
-pub use transaction::*;
+pub use implicit::ImplicitOps;
+pub use explicit::ExplicitOps;
+pub use transaction::TransactionOps;
