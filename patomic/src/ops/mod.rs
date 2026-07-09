@@ -9,7 +9,7 @@ pub use unchecked_implicit::*;
 pub use unchecked_explicit::*;
 pub use unchecked_transaction::*;
 
-mod macros;
+pub(crate) mod macros;
 
 mod implicit;
 mod explicit;
