@@ -420,15 +420,16 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         outcome.assume_init().into()
     }
 
-    unsafe fn unchecked_multi_cmpxchg_transaction(
-        &self, cxs: &[CmpxchgOperands], config: TransactionConfigWfb
+    unsafe fn unchecked_multi_cmpxchg_transaction<const N: usize>(
+        &self, cxs: [CmpxchgOperands; N], config: TransactionConfigWfb
     ) -> TransactionOutcomeWfb {
         let fp_multi_cmpxchg =
             self.ffi_ops().special_ops.fp_multi_cmpxchg.unwrap_unchecked();
+        let raw: [patomic_transaction_cmpxchg_t; N] = cxs.map(Into::into);
         let mut outcome = MaybeUninit::uninit();
         fp_multi_cmpxchg(
-            cxs.as_ptr().cast(),
-            cxs.len(),
+            raw.as_ptr().cast(),
+            N,
             config.into(),
             outcome.as_mut_ptr(),
         );
@@ -498,13 +499,13 @@ pub trait UncheckedTransactionOps: FfiOpsTransaction {
         let fp_test = self.ffi_ops().flag_ops.fp_test.unwrap_unchecked();
         fp_test(flag.as_ptr().cast()) != 0
     }
-    
+
     unsafe fn unchecked_flag_test_set(&self, flag: SharedFlagRef) -> bool {
         let fp_test_set = 
             self.ffi_ops().flag_ops.fp_test_set.unwrap_unchecked();
         fp_test_set(flag.as_mut_ptr().cast()) != 0
     }
-    
+
     unsafe fn unchecked_flag_clear(&self, flag: SharedFlagRef) {
         let fp_clear = self.ffi_ops().flag_ops.fp_clear.unwrap_unchecked();
         fp_clear(flag.as_mut_ptr().cast())

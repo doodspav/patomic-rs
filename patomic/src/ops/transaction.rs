@@ -325,13 +325,13 @@ pub trait TransactionOps: UncheckedTransactionOps {
         })
     }
 
-    fn multi_cmpxchg_transaction(
-        &self, cxs: &[CmpxchgOperands], config: TransactionConfigWfb
+    fn multi_cmpxchg_transaction<const N: usize>(
+        &self, cxs: [CmpxchgOperands; N], config: TransactionConfigWfb
     ) -> TransactionOpResult<TransactionOutcomeWfb> {
         if self.ffi_ops().special_ops.fp_multi_cmpxchg.is_none() {
             return Err(TransactionOpError::UnsupportedOperation);
         }
-        for cx in cxs {
+        for cx in &cxs {
             if cx.obj.len() != config.width
                 || cx.expected.len() != config.width
                 || cx.desired.len() != config.width {
