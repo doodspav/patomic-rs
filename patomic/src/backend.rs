@@ -25,13 +25,10 @@ impl Id {
     pub const ALL: Self = Self::from_bits_retain(u32::MAX);
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SingleId(Id);
 
 impl SingleId {
-    pub const NULL: Self = Self::new(Id::NULL).unwrap();
-    pub const STDC: Self = Self::new(Id::NULL).unwrap();
-    pub const MSVC: Self = Self::new(Id::NULL).unwrap();
-
     pub const fn new(id: Id) -> Option<Self> {
         if id.bits().count_ones() <= 1 {
             Some(Self(id))
