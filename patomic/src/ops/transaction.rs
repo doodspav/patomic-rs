@@ -193,7 +193,7 @@ pub trait TransactionOps: UncheckedTransactionOps {
         &self, obj: SharedBytesRef, ret: &mut [u8], config: TransactionConfig
     ) -> TransactionOpResult<TransactionOutcome> {
         do_transaction_checks!(
-            self.ffi_ops().binary_ops, fp_fetch_or, config,
+            self.ffi_ops().binary_ops, fp_fetch_not, config,
             obj, ret,
         );
         Ok(unsafe { self.unchecked_fetch_not_transaction(obj, ret, config) })
