@@ -1,17 +1,31 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+#![no_std]
+
+mod align;
+mod ordering;
+mod shared;
+
+pub mod backend;
+pub mod capabilities;
+pub mod error;
+pub mod ops;
+pub mod transaction;
+
+pub use align::{Alignment, AtomicLayout};
+pub use ordering::Ordering;
+pub use shared::{SharedBytesRef, SharedFlagRef};
+
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use patomic_sys as sys;
 
     #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    fn version_matches_sys_version() {
+        assert_eq!(VERSION, sys::PATOMIC_VERSION_STRING);
     }
 }

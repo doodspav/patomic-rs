@@ -6,7 +6,7 @@ use core::ffi::{c_char, c_int};
 pub const PATOMIC_VERSION_MAJOR: i32 = 1;
 pub const PATOMIC_VERSION_MINOR: i32 = 1;
 pub const PATOMIC_VERSION_PATCH: i32 = 0;
-pub const PATOMIC_VERSION_STRING: &str = "1.1.0";
+pub const PATOMIC_VERSION_STRING: &str = env!("CARGO_PKG_VERSION");
 
 #[inline]
 pub const fn PATOMIC_VERSION_COMPATIBLE_WITH(
@@ -39,7 +39,6 @@ unsafe extern "C" {
 use core::ffi::CStr;
 
 #[cfg(test)]
-
 mod tests {
     use super::*;
 
