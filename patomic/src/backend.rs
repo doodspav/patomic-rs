@@ -9,6 +9,7 @@ use bitflags::bitflags;
 use patomic_sys::*;
 
 use crate::{Alignment, AtomicLayout, Ordering};
+use crate::capabilities::{AtomicCapabilities, TransactionCapabilities};
 use crate::ops::*;
 
 // todo: document that new ids may be added as a minor change
@@ -252,6 +253,8 @@ impl UncheckedExplicitOps for AtomicBackend {}
 impl ImplicitOps for AtomicBackend {}
 impl ExplicitOps for AtomicBackend {}
 
+impl AtomicCapabilities for AtomicBackend {}
+
 #[derive(Debug, Copy, Clone)]
 pub struct TransactionBackend {
     ops_transaction: patomic_ops_transaction_t,
@@ -283,3 +286,5 @@ unsafe impl FfiOpsTransaction for TransactionBackend {
 impl UncheckedTransactionOps for TransactionBackend {}
 
 impl TransactionOps for TransactionBackend {}
+
+impl TransactionCapabilities for TransactionBackend {}
