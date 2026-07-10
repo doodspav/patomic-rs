@@ -110,6 +110,7 @@ bitflags! {
 bitflags! {
     #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
     pub struct TSpecOpKind: u16 {
+        const DOUBLE_CMPXCHG = patomic_opkind_DOUBLE_CMPXCHG as u16;
         const MULTI_CMPXCHG = patomic_opkind_MULTI_CMPXCHG as u16;
         const GENERIC = patomic_opkind_GENERIC as u16;
         const GENERIC_WFB = patomic_opkind_GENERIC_WFB as u16;
