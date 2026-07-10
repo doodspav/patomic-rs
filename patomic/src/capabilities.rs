@@ -209,6 +209,41 @@ pub trait TransactionCapabilities: FfiOpsTransaction {
     }
 
     fn capabilities_leaf(&self, cat: TransactionOpCat) -> TransactionOpKind {
-        todo!()
+        let ops = self.ffi_ops();
+        let (cat_bit, kind_bits) = match cat {
+            TransactionOpCat::Ldst => (patomic_opcat_LDST, LdstOpKind::all().bits()),
+            TransactionOpCat::Xchg => (patomic_opcat_XCHG, XchgOpKind::all().bits()),
+            TransactionOpCat::Bit  => (patomic_opcat_BIT,   BitOpKind::all().bits()),
+            TransactionOpCat::BinV => (patomic_opcat_BIN_V, BinOpKind::all().bits()),
+            TransactionOpCat::BinF => (patomic_opcat_BIN_F, BinOpKind::all().bits()),
+            TransactionOpCat::AriV => (patomic_opcat_ARI_V, AriOpKind::all().bits()),
+            TransactionOpCat::AriF => (patomic_opcat_ARI_F, AriOpKind::all().bits()),
+            TransactionOpCat::TSpec => (patomic_opcat_TSPEC, TSpecOpKind::all().bits()),
+            TransactionOpCat::TFlag => (patomic_opcat_TFLAG, TFlagOpKind::all().bits()),
+        };
+        let bits = unsafe { patomic_feature_check_leaf_transaction(
+            ops, cat_bit, kind_bits as c_uint
+        ) } as u16;
+
+        macro_rules! leaf {
+            ($bits:ident, $Kind:ty, $Variant:ident) => {{
+                let unsupported = <$Kind>::from_bits_retain($bits);
+                TransactionOpKind::$Variant(
+                    <$Kind>::all().difference(unsupported)
+                )
+            }};
+        }
+
+        match cat {
+            TransactionOpCat::Ldst => leaf!(bits, LdstOpKind, Ldst),
+            TransactionOpCat::Xchg => leaf!(bits, XchgOpKind, Xchg),
+            TransactionOpCat::Bit  => leaf!(bits, BitOpKind, Bit),
+            TransactionOpCat::BinV | TransactionOpCat::BinF =>
+                leaf!(bits, BinOpKind, Bin),
+            TransactionOpCat::AriV | TransactionOpCat::AriF =>
+                leaf!(bits, AriOpKind, Ari),
+            TransactionOpCat::TSpec => leaf!(bits, TSpecOpKind, TSpec),
+            TransactionOpCat::TFlag => leaf!(bits, TFlagOpKind, TFlag),
+        }
     }
 }
