@@ -79,9 +79,7 @@ impl<'a> SharedFlagRef<'a> {
     }
 
     pub fn from_mut(flag: &'a mut u8) -> Self {
-        let ptr = flag as *mut u8 as *mut UnsafeCell<u8>;
-        let flag = unsafe { &*ptr };
-        Self { flag }
+        Self { flag: UnsafeCell::from_mut(flag) }
     }
 
     pub fn as_ptr(&self) -> *const u8 {

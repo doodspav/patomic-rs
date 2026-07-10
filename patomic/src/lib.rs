@@ -14,14 +14,6 @@ pub mod ops;
 pub mod transaction;
 
 pub use align::{Alignment, AtomicLayout};
-pub use backend::{
-    AtomicBackend, AtomicBackendBuilder,
-    TransactionBackend, TransactionBackendBuilder,
-};
-pub use error::{
-    AtomicError, AtomicResult,
-    TransactionError, TransactionResult,
-};
 pub use ordering::Ordering;
 pub use shared::{SharedBytesRef, SharedFlagRef};
 
