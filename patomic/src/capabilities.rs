@@ -158,7 +158,34 @@ pub trait AtomicCapabilities: FfiOpsImplicit {
     }
 
     fn capabilities_leaf(&self, cat: AtomicOpCat) -> AtomicOpKind {
-        todo!()
+        let ops = self.ffi_ops();
+        let (cat_bit, kind_bits) = match cat {
+            AtomicOpCat::Ldst => (patomic_opcat_LDST, LdstOpKind::all().bits()),
+            AtomicOpCat::Xchg => (patomic_opcat_XCHG, XchgOpKind::all().bits()),
+            AtomicOpCat::Bit  => (patomic_opcat_BIT,   BitOpKind::all().bits()),
+            AtomicOpCat::BinV => (patomic_opcat_BIN_V, BinOpKind::all().bits()),
+            AtomicOpCat::BinF => (patomic_opcat_BIN_F, BinOpKind::all().bits()),
+            AtomicOpCat::AriV => (patomic_opcat_ARI_V, AriOpKind::all().bits()),
+            AtomicOpCat::AriF => (patomic_opcat_ARI_F, AriOpKind::all().bits()),
+        };
+        let bits = unsafe { patomic_feature_check_leaf(
+            ops, cat_bit, kind_bits as c_uint
+        ) } as u16;
+
+        macro_rules! leaf {
+            ($bits:ident, $Kind:ty, $Variant:ident) => {{
+                let unsupported = <$Kind>::from_bits_retain($bits);
+                AtomicOpKind::$Variant(<$Kind>::all().difference(unsupported))
+            }};
+        }
+
+        match cat {
+            AtomicOpCat::Ldst => leaf!(bits, LdstOpKind, Ldst),
+            AtomicOpCat::Xchg => leaf!(bits, XchgOpKind, Xchg),
+            AtomicOpCat::Bit  => leaf!(bits, BitOpKind, Bit),
+            AtomicOpCat::BinV | AtomicOpCat::BinF => leaf!(bits, BinOpKind, Bin),
+            AtomicOpCat::AriV | AtomicOpCat::AriF => leaf!(bits, AriOpKind, Ari),
+        }
     }
 }
 
