@@ -1,6 +1,8 @@
 // Copyright (c) doodspav.
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+use core::ffi::c_uint;
+
 use bitflags::bitflags;
 
 use patomic_sys::*;
@@ -33,20 +35,7 @@ pub enum TransactionOpCat {
 
 bitflags! {
     #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
-    pub struct AtomicOpCatSet: u16 {
-        const LDST = patomic_opcat_LDST as u16;
-        const XCHG = patomic_opcat_XCHG as u16;
-        const BIT = patomic_opcat_BIT as u16;
-        const BIN_V = patomic_opcat_BIN_V as u16;
-        const BIN_F = patomic_opcat_BIN_F as u16;
-        const ARI_V = patomic_opcat_ARI_V as u16;
-        const ARI_F = patomic_opcat_ARI_F as u16;
-    }
-}
-
-bitflags! {
-    #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
-    pub struct TransactionOpCatSet: u16 {
+    pub struct OpCatSet: u16 {
         const LDST = patomic_opcat_LDST as u16;
         const XCHG = patomic_opcat_XCHG as u16;
         const BIT = patomic_opcat_BIT as u16;
@@ -148,4 +137,48 @@ pub enum TransactionOpKind {
     AriF(AriOpKind),
     TSpec(TSpecOpKind),
     TFlag(TFlagOpKind),
+}
+
+pub trait AtomicCapabilities: FfiOpsImplicit {
+    fn capabilities_all(&self) -> OpCatSet {
+        let ops = self.ffi_ops();
+        let bits = unsafe {
+            patomic_feature_check_all(&*ops, patomic_opcats_IMPLICIT as c_uint)
+        };
+        OpCatSet::from_bits_truncate(bits as u16)
+    }
+
+    fn capabilities_any(&self) -> OpCatSet {
+        let ops = self.ffi_ops();
+        let bits = unsafe {
+            patomic_feature_check_any(&*ops, patomic_opcats_IMPLICIT as c_uint)
+        };
+        OpCatSet::from_bits_truncate(bits as u16)
+    }
+
+    fn capabilities_leaf(&self, cat: AtomicOpCat) -> AtomicOpKind {
+        todo!()
+    }
+}
+
+pub trait TransactionCapabilities: FfiOpsTransaction {
+    fn capabilities_all(&self) -> OpCatSet {
+        let ops = self.ffi_ops();
+        let bits = unsafe {
+            patomic_feature_check_all_transaction(&*ops, c_uint::MAX)
+        };
+        OpCatSet::from_bits_truncate(bits as u16)
+    }
+
+    fn capabilities_any(&self) -> OpCatSet {
+        let ops = self.ffi_ops();
+        let bits = unsafe {
+            patomic_feature_check_any_transaction(&*ops, c_uint::MAX)
+        };
+        OpCatSet::from_bits_truncate(bits as u16)
+    }
+
+    fn capabilities_leaf(&self, cat: TransactionOpCat) -> TransactionOpKind {
+        todo!()
+    }
 }
