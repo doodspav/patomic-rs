@@ -45,6 +45,9 @@ bitflags! {
         const ARI_F = patomic_opcat_ARI_F as u16;
         const TSPEC = patomic_opcat_TSPEC as u16;
         const TFLAG = patomic_opcat_TFLAG as u16;
+
+        const ALL_ATOMIC = patomic_opcats_IMPLICIT as u16;
+        const ALL_TRANSACTION = patomic_opcats_TRANSACTION as u16;
     }
 }
 
@@ -139,19 +142,19 @@ pub trait AtomicCapabilities: FfiOpsImplicit {
     fn capabilities_all(&self) -> OpCatSet {
         let ops = self.ffi_ops();
         let bits = unsafe { patomic_feature_check_all(
-            ops, patomic_opcats_IMPLICIT as c_uint
+            ops, OpCatSet::ALL_ATOMIC.bits() as c_uint
         ) } as u16;
         let unsupported = OpCatSet::from_bits_retain(bits);
-        OpCatSet::all().difference(unsupported)
+        OpCatSet::ALL_ATOMIC.difference(unsupported)
     }
 
     fn capabilities_any(&self) -> OpCatSet {
         let ops = self.ffi_ops();
         let bits = unsafe { patomic_feature_check_any(
-            ops, patomic_opcats_IMPLICIT as c_uint
+            ops, OpCatSet::ALL_ATOMIC.bits() as c_uint
         ) } as u16;
         let unsupported = OpCatSet::from_bits_retain(bits);
-        OpCatSet::all().difference(unsupported)
+        OpCatSet::ALL_ATOMIC.difference(unsupported)
     }
 
     fn capabilities_leaf(&self, cat: AtomicOpCat) -> AtomicOpKind {
@@ -163,19 +166,19 @@ pub trait TransactionCapabilities: FfiOpsTransaction {
     fn capabilities_all(&self) -> OpCatSet {
         let ops = self.ffi_ops();
         let bits = unsafe { patomic_feature_check_all_transaction(
-            ops, patomic_opcats_TRANSACTION as c_uint
+            ops, OpCatSet::ALL_TRANSACTION.bits() as c_uint
         ) } as u16;
         let unsupported = OpCatSet::from_bits_retain(bits);
-        OpCatSet::all().difference(unsupported)
+        OpCatSet::ALL_TRANSACTION.difference(unsupported)
     }
 
     fn capabilities_any(&self) -> OpCatSet {
         let ops = self.ffi_ops();
         let bits = unsafe { patomic_feature_check_any_transaction(
-            ops, patomic_opcats_TRANSACTION as c_uint
+            ops, OpCatSet::ALL_TRANSACTION.bits() as c_uint
         ) } as u16;
         let unsupported = OpCatSet::from_bits_retain(bits);
-        OpCatSet::all().difference(unsupported)
+        OpCatSet::ALL_TRANSACTION.difference(unsupported)
     }
 
     fn capabilities_leaf(&self, cat: TransactionOpCat) -> TransactionOpKind {
