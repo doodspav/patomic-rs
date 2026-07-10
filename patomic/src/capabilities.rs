@@ -120,10 +120,8 @@ pub enum AtomicOpKind {
     Ldst(LdstOpKind),
     Xchg(XchgOpKind),
     Bit(BitOpKind),
-    BinV(BinOpKind),
-    BinF(BinOpKind),
-    AriV(AriOpKind),
-    AriF(AriOpKind),
+    Bin(BinOpKind),
+    Ari(AriOpKind),
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
@@ -131,10 +129,8 @@ pub enum TransactionOpKind {
     Ldst(LdstOpKind),
     Xchg(XchgOpKind),
     Bit(BitOpKind),
-    BinV(BinOpKind),
-    BinF(BinOpKind),
-    AriV(AriOpKind),
-    AriF(AriOpKind),
+    Bin(BinOpKind),
+    Ari(AriOpKind),
     TSpec(TSpecOpKind),
     TFlag(TFlagOpKind),
 }
@@ -142,18 +138,20 @@ pub enum TransactionOpKind {
 pub trait AtomicCapabilities: FfiOpsImplicit {
     fn capabilities_all(&self) -> OpCatSet {
         let ops = self.ffi_ops();
-        let bits = unsafe {
-            patomic_feature_check_all(&*ops, patomic_opcats_IMPLICIT as c_uint)
-        };
-        OpCatSet::from_bits_truncate(bits as u16)
+        let bits = unsafe { patomic_feature_check_all(
+            ops, patomic_opcats_IMPLICIT as c_uint
+        ) } as u16;
+        let unsupported = OpCatSet::from_bits_retain(bits);
+        OpCatSet::all().difference(unsupported)
     }
 
     fn capabilities_any(&self) -> OpCatSet {
         let ops = self.ffi_ops();
-        let bits = unsafe {
-            patomic_feature_check_any(&*ops, patomic_opcats_IMPLICIT as c_uint)
-        };
-        OpCatSet::from_bits_truncate(bits as u16)
+        let bits = unsafe { patomic_feature_check_any(
+            ops, patomic_opcats_IMPLICIT as c_uint
+        ) } as u16;
+        let unsupported = OpCatSet::from_bits_retain(bits);
+        OpCatSet::all().difference(unsupported)
     }
 
     fn capabilities_leaf(&self, cat: AtomicOpCat) -> AtomicOpKind {
@@ -164,18 +162,20 @@ pub trait AtomicCapabilities: FfiOpsImplicit {
 pub trait TransactionCapabilities: FfiOpsTransaction {
     fn capabilities_all(&self) -> OpCatSet {
         let ops = self.ffi_ops();
-        let bits = unsafe {
-            patomic_feature_check_all_transaction(&*ops, c_uint::MAX)
-        };
-        OpCatSet::from_bits_truncate(bits as u16)
+        let bits = unsafe { patomic_feature_check_all_transaction(
+            ops, patomic_opcats_TRANSACTION as c_uint
+        ) } as u16;
+        let unsupported = OpCatSet::from_bits_retain(bits);
+        OpCatSet::all().difference(unsupported)
     }
 
     fn capabilities_any(&self) -> OpCatSet {
         let ops = self.ffi_ops();
-        let bits = unsafe {
-            patomic_feature_check_any_transaction(&*ops, c_uint::MAX)
-        };
-        OpCatSet::from_bits_truncate(bits as u16)
+        let bits = unsafe { patomic_feature_check_any_transaction(
+            ops, patomic_opcats_TRANSACTION as c_uint
+        ) } as u16;
+        let unsupported = OpCatSet::from_bits_retain(bits);
+        OpCatSet::all().difference(unsupported)
     }
 
     fn capabilities_leaf(&self, cat: TransactionOpCat) -> TransactionOpKind {
