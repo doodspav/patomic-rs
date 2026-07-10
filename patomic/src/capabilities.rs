@@ -46,8 +46,19 @@ bitflags! {
         const TSPEC = patomic_opcat_TSPEC as u16;
         const TFLAG = patomic_opcat_TFLAG as u16;
 
-        const ALL_ATOMIC = patomic_opcats_IMPLICIT as u16;
-        const ALL_TRANSACTION = patomic_opcats_TRANSACTION as u16;
+        const ALL_ATOMIC =
+            Self::LDST.bits()  |
+            Self::XCHG.bits()  |
+            Self::BIT.bits()   |
+            Self::BIN_V.bits() |
+            Self::BIN_F.bits() |
+            Self::ARI_V.bits() |
+            Self::ARI_F.bits();
+
+        const ALL_TRANSACTION =
+            Self::ALL_ATOMIC.bits() |
+            Self::TSPEC.bits()      |
+            Self::TFLAG.bits();
     }
 }
 
