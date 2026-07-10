@@ -8,6 +8,7 @@ mod ordering;
 mod shared;
 
 pub mod backend;
+pub mod capabilities;
 pub mod error;
 pub mod ops;
 pub mod transaction;
