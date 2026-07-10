@@ -7,6 +7,58 @@ use patomic_sys::*;
 
 use crate::ops::{FfiOpsImplicit, FfiOpsTransaction};
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub enum AtomicOpCat {
+    Ldst,
+    Xchg,
+    Bit,
+    BinV,
+    BinF,
+    AriV,
+    AriF,
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub enum TransactionOpCat {
+    Ldst,
+    Xchg,
+    Bit,
+    BinV,
+    BinF,
+    AriV,
+    AriF,
+    TSpec,
+    TFlag,
+}
+
+bitflags! {
+    #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+    pub struct AtomicOpCatSet: u16 {
+        const LDST = patomic_opcat_LDST as u16;
+        const XCHG = patomic_opcat_XCHG as u16;
+        const BIT = patomic_opcat_BIT as u16;
+        const BIN_V = patomic_opcat_BIN_V as u16;
+        const BIN_F = patomic_opcat_BIN_F as u16;
+        const ARI_V = patomic_opcat_ARI_V as u16;
+        const ARI_F = patomic_opcat_ARI_F as u16;
+    }
+}
+
+bitflags! {
+    #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+    pub struct TransactionOpCatSet: u16 {
+        const LDST = patomic_opcat_LDST as u16;
+        const XCHG = patomic_opcat_XCHG as u16;
+        const BIT = patomic_opcat_BIT as u16;
+        const BIN_V = patomic_opcat_BIN_V as u16;
+        const BIN_F = patomic_opcat_BIN_F as u16;
+        const ARI_V = patomic_opcat_ARI_V as u16;
+        const ARI_F = patomic_opcat_ARI_F as u16;
+        const TSPEC = patomic_opcat_TSPEC as u16;
+        const TFLAG = patomic_opcat_TFLAG as u16;
+    }
+}
+
 bitflags! {
     #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
     pub struct LdstOpKind: u16 {
@@ -73,6 +125,7 @@ bitflags! {
     }
 }
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum AtomicOpKind {
     Ldst(LdstOpKind),
     Xchg(XchgOpKind),
@@ -83,6 +136,7 @@ pub enum AtomicOpKind {
     AriF(AriOpKind),
 }
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum TransactionOpKind {
     Ldst(LdstOpKind),
     Xchg(XchgOpKind),
