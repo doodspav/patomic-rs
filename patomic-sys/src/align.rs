@@ -83,36 +83,36 @@ mod tests {
             self.data.len()
         }
 
-        fn ptr(&self) -> *const u8 {
+        fn as_ptr(&self) -> *const u8 {
             self.data.as_ptr()
+        }
+
+        fn as_slice(&self) -> &[u8] {
+            &self.data
         }
     }
 
     fn make_align(
-        recommended: usize, minimum: usize, size_within: usize
+        recommended: NonZeroUsize, minimum: NonZeroUsize, size_within: usize
     ) -> patomic_align_t {
-        patomic_align_t {
-            recommended: NonZeroUsize::new(recommended).unwrap(),
-            minimum: NonZeroUsize::new(minimum).unwrap(),
-            size_within
-        }
+        patomic_align_t { recommended, minimum, size_within }
     }
 
     fn make_aligned_pointer(
-        buf_ptr: *const u8, buf_size: usize, align: NonZeroUsize, size: usize
+        buf: &[u8], align: NonZeroUsize, size: usize
     ) -> *const u8 {
         // calculate the offset to the next aligned address
-        let raw_addr = buf_ptr.addr();
+        let raw_addr = buf.as_ptr().addr();
         let remainder = raw_addr % align.get();
         let offset = (align.get() - remainder) % align.get();
 
         // check that there is enough room in the buffer
-        if buf_size < (offset + size) {
+        if buf.len() < (offset + size) {
             return core::ptr::null();
         }
 
         // return aligned pointer
-        unsafe { buf_ptr.add(offset) }
+        unsafe { buf.as_ptr().add(offset) }
     }
 
     fn runtime_alignof(ptr: *const u8) -> usize {
@@ -126,25 +126,78 @@ mod tests {
     }
 
     #[test]
-    fn max_cache_line_size_abi_unstable_is_pow2() {}
+    fn max_cache_line_size_abi_unstable_is_pow2() {
+        let val = PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE;
+        assert!(val.is_power_of_two());
+    }
 
     #[test]
-    fn max_cache_line_size_fn_cmp_le_unstable() {}
+    fn max_cache_line_size_fn_cmp_le_unstable() {
+        let fn_val = unsafe { patomic_cache_line_size() };
+        let unstable_val = PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE;
+        assert!(fn_val <= unstable_val);
+    }
 
     #[test]
-    fn meets_recommended_fails_recommended_non_pow2() {}
+    fn meets_recommended_fails_recommended_non_pow2() {
+        let buf = OverAlignedBuffer::new();
+        let align = make_align(nz(3), nz(1), 0);
+        let ptr = make_aligned_pointer(buf.as_slice(), align.recommended, 1);
+
+        assert!(!align.recommended.is_power_of_two());
+        assert!(!ptr.is_null());
+
+        // pointer is aligned (don't use runtime_alignof because non-pow2)
+        assert_eq!(0, ptr as usize % align.recommended.get());
+
+        assert!(!PATOMIC_ALIGN_MEETS_RECOMMENDED(ptr.cast(), align));
+    }
 
     #[test]
-    fn meets_recommended_fails_cmp_gt_pointer_align() {}
+    fn meets_recommended_fails_cmp_gt_pointer_align() {
+        let buf = OverAlignedBuffer::new();
+        let ptr = buf.as_ptr();
+        let align = make_align(nz(runtime_alignof(ptr) * 2), nz(1), 0);
+
+        assert!(align.recommended.is_power_of_two());
+        assert!(align.recommended.get() > runtime_alignof(ptr));
+
+        assert!(!PATOMIC_ALIGN_MEETS_RECOMMENDED(ptr.cast(), align));
+    }
 
     #[test]
-    fn meets_recommended_succeeds_cmp_eq_pointer_align() {}
+    fn meets_recommended_succeeds_cmp_eq_pointer_align() {
+        let buf = OverAlignedBuffer::new();
+        let ptr = buf.as_ptr();
+        let align = make_align(nz(runtime_alignof(ptr)), nz(1), 0);
+
+        assert!(align.recommended.is_power_of_two());
+        assert_eq!(align.recommended.get(), runtime_alignof(ptr));
+
+        assert!(PATOMIC_ALIGN_MEETS_RECOMMENDED(ptr.cast(), align));
+    }
 
     #[test]
-    fn meets_recommended_succeeds_cmp_lt_pointer_align() {}
+    fn meets_recommended_succeeds_cmp_lt_pointer_align() {
+        let buf = OverAlignedBuffer::new();
+        let ptr = buf.as_ptr();
+        let align = make_align(nz(runtime_alignof(ptr) / 2), nz(1), 0);
+
+        assert!(align.recommended.is_power_of_two());
+        assert!(align.recommended.get() < runtime_alignof(ptr));
+
+        assert!(PATOMIC_ALIGN_MEETS_RECOMMENDED(ptr.cast(), align));
+    }
 
     #[test]
-    fn meets_recommended_succeeds_pointer_is_null() {}
+    fn meets_recommended_succeeds_pointer_is_null() {
+        let align = make_align(nz(32768), nz(1), 0);
+        let ptr: *const u8 = core::ptr::null();
+
+        assert!(align.recommended.is_power_of_two());
+
+        assert!(PATOMIC_ALIGN_MEETS_RECOMMENDED(ptr.cast(), align));
+    }
 
     #[test]
     fn meets_minimum_fails_minimum_non_pow2() {}
