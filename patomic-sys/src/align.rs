@@ -103,9 +103,7 @@ mod tests {
         let offset = (align.get() - remainder) % align.get();
 
         // check that there is enough room in the buffer
-        if buf.len() < (offset + size) {
-            return core::ptr::null();
-        }
+        assert!(buf.len() >= offset + size);
 
         // return aligned pointer
         unsafe { buf.as_ptr().add(offset) }
@@ -141,7 +139,6 @@ mod tests {
         let ptr = make_aligned_pointer(buf.as_slice(), align.recommended, 1);
 
         assert!(!align.recommended.is_power_of_two());
-        assert!(!ptr.is_null());
 
         // pointer is aligned (don't use runtime_alignof because non-pow2)
         assert_eq!(0, ptr as usize % align.recommended.get());
@@ -203,7 +200,6 @@ mod tests {
 
         assert_eq!(0, align.size_within);
         assert!(!align.minimum.is_power_of_two());
-        assert!(!ptr.is_null());
 
         // pointer is aligned (don't use runtime_alignof because non-pow2)
         assert_eq!(0, ptr as usize % align.minimum.get());
