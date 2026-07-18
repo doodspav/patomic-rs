@@ -200,19 +200,70 @@ mod tests {
     }
 
     #[test]
-    fn meets_minimum_fails_minimum_non_pow2() {}
+    fn meets_minimum_fails_minimum_non_pow2() {
+        let buf = OverAlignedBuffer::new();
+        let align = make_align(nz(1), nz(3), 0);
+        let ptr = make_aligned_pointer(buf.as_slice(), align.minimum, 1);
+
+        assert_eq!(0, align.size_within);
+        assert!(!align.minimum.is_power_of_two());
+        assert!(!ptr.is_null());
+
+        // pointer is aligned (don't use runtime_alignof because non-pow2)
+        assert_eq!(0, ptr as usize % align.minimum.get());
+
+        assert!(!PATOMIC_ALIGN_MEETS_MINIMUM(ptr.cast(), align, nz(1)));
+    }
 
     #[test]
-    fn meets_minimum_fails_cmp_gt_pointer_align() {}
+    fn meets_minimum_fails_cmp_gt_pointer_align() {
+        let buf = OverAlignedBuffer::new();
+        let ptr = buf.as_ptr();
+        let align = make_align(nz(1), nz(runtime_alignof(ptr) * 2), 0);
+
+        assert_eq!(0, align.size_within);
+        assert!(align.minimum.is_power_of_two());
+        assert!(align.minimum.get() > runtime_alignof(ptr));
+
+        assert!(!PATOMIC_ALIGN_MEETS_MINIMUM(ptr.cast(), align, nz(1)));
+    }
 
     #[test]
-    fn meets_minimum_succeeds_cmp_eq_pointer_align() {}
+    fn meets_minimum_succeeds_cmp_eq_pointer_align() {
+        let buf = OverAlignedBuffer::new();
+        let ptr = buf.as_ptr();
+        let align = make_align(nz(1), nz(runtime_alignof(ptr)), 0);
+
+        assert_eq!(0, align.size_within);
+        assert!(align.minimum.is_power_of_two());
+        assert_eq!(align.minimum.get(), runtime_alignof(ptr));
+
+        assert!(PATOMIC_ALIGN_MEETS_MINIMUM(ptr.cast(), align, nz(1)));
+    }
 
     #[test]
-    fn meets_minimum_succeeds_cmp_lt_pointer_align() {}
+    fn meets_minimum_succeeds_cmp_lt_pointer_align() {
+        let buf = OverAlignedBuffer::new();
+        let ptr = buf.as_ptr();
+        let align = make_align(nz(1), nz(runtime_alignof(ptr) / 2), 0);
+
+        assert_eq!(0, align.size_within);
+        assert!(align.minimum.is_power_of_two());
+        assert!(align.minimum.get() < runtime_alignof(ptr));
+
+        assert!(PATOMIC_ALIGN_MEETS_MINIMUM(ptr.cast(), align, nz(1)));
+    }
 
     #[test]
-    fn meets_minimum_succeeds_pointer_is_null() {}
+    fn meets_minimum_succeeds_pointer_is_null() {
+        let align = make_align(nz(1), nz(32768), 0);
+        let ptr: *const u8 = core::ptr::null();
+
+        assert_eq!(0, align.size_within);
+        assert!(align.minimum.is_power_of_two());
+
+        assert!(PATOMIC_ALIGN_MEETS_MINIMUM(ptr.cast(), align, nz(1)));
+    }
 
     #[test]
     fn meets_minimum_succeeds_zero_size_buffer_any_size_within() {}
