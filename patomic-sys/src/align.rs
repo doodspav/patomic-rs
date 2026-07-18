@@ -79,10 +79,6 @@ mod tests {
             Self { data: [0u8; Self::SIZE] }
         }
 
-        const fn len(&self) -> usize {
-            self.data.len()
-        }
-
         fn as_ptr(&self) -> *const u8 {
             self.data.as_ptr()
         }
@@ -266,17 +262,80 @@ mod tests {
     }
 
     #[test]
-    fn meets_minimum_succeeds_zero_size_buffer_any_size_within() {}
+    fn meets_minimum_succeeds_buffer_smaller_fits_in_size_within() {
+        let buf = OverAlignedBuffer::new();
+        let ptr = unsafe { buf.as_ptr().add(1) };
+        let align = make_align(nz(1), nz(1), 8);
+
+        assert!(align.size_within > 2);
+        assert!(align.minimum.is_power_of_two());
+
+        assert!(runtime_alignof(buf.as_ptr()) >= align.minimum.get());
+        assert!(runtime_alignof(buf.as_ptr()) >= align.size_within);
+        assert!(runtime_alignof(ptr) >= align.minimum.get());
+
+        assert!(PATOMIC_ALIGN_MEETS_MINIMUM(
+            ptr.cast(), align, nz(align.size_within - 2)
+        ));
+    }
 
     #[test]
-    fn meets_minimum_succeeds_buffer_smaller_fits_in_size_within() {}
+    fn meets_minimum_succeeds_buffer_exactly_fits_in_size_within() {
+        let buf = OverAlignedBuffer::new();
+        let ptr = buf.as_ptr();
+        let align = make_align(nz(1), nz(1), 8);
+
+        assert_ne!(0, align.size_within);
+        assert!(align.minimum.is_power_of_two());
+
+        assert!(runtime_alignof(ptr) >= align.minimum.get());
+        assert!(runtime_alignof(ptr) >= align.size_within);
+
+        assert!(PATOMIC_ALIGN_MEETS_MINIMUM(
+            ptr.cast(), align, nz(align.size_within)
+        ));
+    }
 
     #[test]
-    fn meets_minimum_succeeds_buffer_exactly_fits_in_size_within() {}
+    fn meets_minimum_fails_buffer_larger_than_size_within() {
+        let buf = OverAlignedBuffer::new();
+        let ptr = buf.as_ptr();
+        let align = make_align(nz(1), nz(1), 8);
+
+        assert_ne!(0, align.size_within);
+        assert!(align.minimum.is_power_of_two());
+
+        assert!(runtime_alignof(ptr) >= align.minimum.get());
+        assert!(runtime_alignof(ptr) >= align.size_within);
+
+        assert!(!PATOMIC_ALIGN_MEETS_MINIMUM(
+            ptr.cast(), align, nz(align.size_within + 1)
+        ));
+    }
 
     #[test]
-    fn meets_minimum_fails_buffer_larger_than_size_within() {}
+    fn meets_minimum_fails_buffer_fits_but_misaligned_for_size_within() {
+        // we need a pointer that is 16 bytes offset from a 64 byte aligned addr
+        // the buffer is 32 bytes, crossing the 64 byte alignment boundary
+        #[repr(align(64))]
+        struct Buffer([u8; 80]);
 
-    #[test]
-    fn meets_minimum_fails_buffer_fits_but_misaligned_for_size_within() {}
+        let buf = Buffer([0u8; 80]);
+        let ptr = unsafe { buf.0.as_ptr().add(64 - 16) };
+        let align = make_align(nz(1), nz(16), 64);
+        let size = nz(32);
+
+        assert!(align.minimum.is_power_of_two());
+
+        // size_within is 64 bytes but pointer is only aligned to 16 bytes
+        assert_eq!(64, align.size_within);
+        assert_eq!(16, align.minimum.get());
+        assert_eq!(16, runtime_alignof(ptr));
+
+        // pointer is 16 bytes from a 64 byte alignment boundary and crosses it
+        assert!(64 <= runtime_alignof(unsafe { ptr.add(16) }));
+        assert!(size.get() > 16);
+
+        assert!(!PATOMIC_ALIGN_MEETS_MINIMUM(ptr.cast(), align, size));
+    }
 }
