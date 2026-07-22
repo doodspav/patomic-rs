@@ -33,6 +33,8 @@ pub enum Ordering {
 
     /// Only present for compatibility. It will always be treated as
     /// [`Acquire`].
+    ///
+    /// [`Acquire`]: Self::Acquire
     Consume = patomic_CONSUME as isize,
 
     /// When coupled with a load, if the loaded value was written by a store
@@ -48,6 +50,8 @@ pub enum Ordering {
     /// Corresponds to [`std::memory_order_acquire`] in C++11 and
     /// [`core::sync::atomic::Ordering::Acquire`] in Rust.
     ///
+    /// [`Release`]: Self::Release
+    /// [`Relaxed`]: Self::Relaxed
     /// [`std::memory_order_acquire`]: https://en.cppreference.com/w/cpp/atomic/memory_order#Release-Acquire_ordering
     Acquire = patomic_ACQUIRE as isize,
 
@@ -65,6 +69,8 @@ pub enum Ordering {
     /// Corresponds to [`std::memory_order_release`] in C++11 and
     /// [`core::sync::atomic::Ordering::Release`] in Rust.
     ///
+    /// [`Acquire`]: Self::Acquire
+    /// [`Relaxed`]: Self::Relaxed
     /// [`std::memory_order_release`]: https://en.cppreference.com/w/cpp/atomic/memory_order#Release-Acquire_ordering
     Release = patomic_RELEASE as isize,
 
@@ -83,6 +89,10 @@ pub enum Ordering {
     /// Corresponds to [`std::memory_order_acq_rel`] in C++11 and
     /// [`core::sync::atomic::Ordering::AcqRel`] in Rust.
     ///
+    /// [`Acquire`]: Self::Acquire
+    /// [`Release`]: Self::Release
+    /// [`AcqRel`]: Self::AcqRel
+    /// [`Relaxed`]: Self::Relaxed
     /// [`std::memory_order_acq_rel`]: https://en.cppreference.com/w/cpp/atomic/memory_order#Release-Acquire_ordering
     AcqRel = patomic_ACQ_REL as isize,
 
@@ -94,6 +104,9 @@ pub enum Ordering {
     /// Corresponds to [`std::memory_order_seq_cst`] in C++11 and
     /// [`core::sync::atomic::Ordering::SeqCst`] in Rust.
     ///
+    /// [`Acquire`]: Self::Acquire
+    /// [`Release`]: Self::Release
+    /// [`AcqRel`]: Self::AcqRel
     /// [`std::memory_order_seq_cst`]: https://en.cppreference.com/w/cpp/atomic/memory_order#Sequentially-consistent_ordering
     SeqCst = patomic_SEQ_CST as isize,
 }
@@ -111,6 +124,10 @@ impl Ordering {
     /// assert!(Ordering::Release.is_valid_store_ordering());
     /// assert!(!Ordering::Acquire.is_valid_store_ordering());
     /// ```
+    ///
+    /// [`Relaxed`]: Self::Relaxed
+    /// [`Release`]: Self::Release
+    /// [`SeqCst`]: Self::SeqCst
     pub const fn is_valid_store_ordering(&self) -> bool {
         PATOMIC_IS_VALID_STORE_ORDER((*self) as c_int)
     }
@@ -128,6 +145,11 @@ impl Ordering {
     /// assert!(Ordering::Acquire.is_valid_load_ordering());
     /// assert!(!Ordering::Release.is_valid_load_ordering());
     /// ```
+    ///
+    /// [`Relaxed`]: Self::Relaxed
+    /// [`Consume`]: Self::Consume
+    /// [`Acquire`]: Self::Acquire
+    /// [`SeqCst`]: Self::SeqCst
     pub const fn is_valid_load_ordering(&self) -> bool {
         PATOMIC_IS_VALID_LOAD_ORDER((*self) as c_int)
     }
@@ -157,7 +179,7 @@ impl Ordering {
     /// ordering when `self` is the success ordering.
     ///
     /// The returned ordering `fail` satisfies
-    /// [`fail.is_valid_fail_ordering_for(self)`](Self::is_valid_ordering_for).
+    /// [`fail.is_valid_fail_ordering_for(self)`](Self::is_valid_fail_ordering_for).
     ///
     /// # Examples
     ///
@@ -187,6 +209,8 @@ impl From<c_int> for Ordering {
     ///
     /// Any value not corresponding to a label in [`patomic_memory_order_t`] is
     /// converted to the fallback value of [`SeqCst`].
+    ///
+    /// [`SeqCst`]: Ordering::SeqCst
     fn from(ordering: c_int) -> Self {
         #[allow(non_upper_case_globals)]
         match ordering {
@@ -221,8 +245,10 @@ impl From<Ordering> for c_int {
 impl From<StdOrdering> for Ordering {
     /// Converts a [`core::sync::atomic::Ordering`] into an [`Ordering`].
     ///
-    /// [`core::sync::atomic::Ordering`] is `'[non_exhaustive]`, so any variant
+    /// [`core::sync::atomic::Ordering`] is `#[non_exhaustive]`, so any variant
     /// added in the future is converted to the fallback value of [`SeqCst`].
+    ///
+    /// [`SeqCst`]: Ordering::SeqCst
     #[inline]
     fn from(ordering: StdOrdering) -> Self {
         match ordering {
@@ -242,6 +268,9 @@ impl From<Ordering> for StdOrdering {
     /// [`Consume`] has no standard library equivalent and
     /// is converted to [`Acquire`](StdOrdering::Acquire), matching how it is
     /// treated by the underlying C library.
+    ///
+    /// [`Consume`]: Ordering::Consume
+    /// [`Acquire`]: Ordering::Acquire
     fn from(ordering: Ordering) -> Self {
         match ordering {
             Ordering::Relaxed => Self::Relaxed,
