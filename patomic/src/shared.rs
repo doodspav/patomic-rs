@@ -119,7 +119,18 @@ impl<'a, const N: usize> From<&'a [UnsafeCell<u8>; N]> for SharedBytesRef<'a> {
 ///
 /// This is intentional.
 ///
+/// # Note
+///
+/// False sharing is more serious with transactions than with standard atomic
+/// operations since it may inadvertently cause the entire transaction to abort.
+///
+/// A [`SharedFlagRef`] can be obtained through [`TransactionFlag::as_ref`]
+/// which references an appropriately padded [`TransactionFlag`] to avoid false
+/// sharing.
+///
 /// [`TransactionBackend`]: crate::backend::TransactionBackend
+/// [`TransactionFlag::as_ref`]: crate::transaction::TransactionFlag::as_ref
+/// [`TransactionFlag`]: crate::transaction::TransactionFlag
 #[derive(Clone, Copy)]
 #[repr(transparent)]
 pub struct SharedFlagRef<'a> {
