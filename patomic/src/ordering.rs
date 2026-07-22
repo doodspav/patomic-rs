@@ -56,7 +56,8 @@ pub enum Ordering {
     Acquire = patomic_ACQUIRE as isize,
 
     /// When coupled with a store, all previous operations become ordered
-    /// before any load of this value with [`Acquire`] (or stronger) ordering.
+    /// before any load of the stored value with [`Acquire`] (or stronger) 
+    /// ordering.
     /// In particular, all previous writes become visible to all threads
     /// that perform an [`Acquire`] (or stronger) load of this value.
     ///
@@ -156,7 +157,7 @@ impl Ordering {
 
     /// Checks that `self` is valid to use as the fail ordering for an atomic
     /// read-modify-write operation which has a read-only fallback operation,
-    /// with `succ` as the success ordering, such as `compare_exchange`.
+    /// such as `compare_exchange`, with `succ` as the success ordering.
     ///
     /// This requires that `self` is a valid load ordering and that it is not
     /// stronger than `succ`.
@@ -175,7 +176,7 @@ impl Ordering {
         )
     }
 
-    /// Returns the strictest memory order that is valid to use as a fail
+    /// Returns the strictest ordering that is valid to use as a fail
     /// ordering when `self` is the success ordering.
     ///
     /// The returned ordering `fail` satisfies
@@ -266,11 +267,10 @@ impl From<Ordering> for StdOrdering {
     /// Converts an [`Ordering`] into a [`core::sync::atomic::Ordering`].
     ///
     /// [`Consume`] has no standard library equivalent and
-    /// is converted to [`Acquire`](StdOrdering::Acquire), matching how it is
-    /// treated by the underlying C library.
+    /// is converted to [`core::sync::atomic::Ordering::Acquire`], matching how
+    /// it is treated by the underlying C library.
     ///
     /// [`Consume`]: Ordering::Consume
-    /// [`Acquire`]: Ordering::Acquire
     fn from(ordering: Ordering) -> Self {
         match ordering {
             Ordering::Relaxed => Self::Relaxed,
