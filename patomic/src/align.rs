@@ -8,8 +8,17 @@ use patomic_sys::*;
 
 use crate::SharedBytesRef;
 
+/// Trait to specify the layout required of a buffer by atomic operations.
+///
+/// Implemented by backends to expose the byte width and alignment required by
+/// their supported atomic operations.
 pub trait AtomicLayout {
+    /// Returns the width in bytes of the buffers that atomic operations can be
+    /// performed on.
     fn width(&self) -> NonZeroUsize;
+
+    /// Returns the alignment requirements that must be met by buffers for
+    /// atomic operations on them to be valid.
     fn alignment(&self) -> Alignment;
 }
 
