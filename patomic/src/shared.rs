@@ -17,7 +17,7 @@ use core::cell::UnsafeCell;
 /// access.
 ///
 /// [`AtomicBackend`]: crate::backend::AtomicBackend
-/// [`TransactionBackend`]: crate::backend::TransactionBackend;
+/// [`TransactionBackend`]: crate::backend::TransactionBackend
 #[derive(Clone, Copy)]
 #[repr(transparent)]
 pub struct SharedBytesRef<'a> {
