@@ -12,7 +12,7 @@
 //! This crate's version will be kept in sync with the version of the underlying
 //! library.
 //! 
-//! [`patomic`]: https://github.com/doodspav/patomic
+//! [`patomic`]: https://github.com/doodspav/patomic/tree/v1.1.0
 
 #![no_std]
 

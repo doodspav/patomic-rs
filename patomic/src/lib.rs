@@ -33,7 +33,7 @@
 //!
 //! This crate is `#![no_std]`.
 //!
-//! [`patomic`]: https://github.com/doodspav/patomic
+//! [`patomic`]: https://github.com/doodspav/patomic/tree/v1.1.0
 
 #![no_std]
 
@@ -57,7 +57,7 @@ pub use shared::{SharedBytesRef, SharedFlagRef};
 /// exposed as `PATOMIC_VERSION_STRING`, which this crate follows for
 /// [Semantic Versioning] purposes.
 ///
-/// [`patomic`]: https://github.com/doodspav.patomic
+/// [`patomic`]: https://github.com/doodspav/patomic/tree/v1.1.0
 /// [Semantic Versioning]: https://semver.org
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
