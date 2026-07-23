@@ -70,6 +70,12 @@ pub enum TransactionExitCode {
     AbortUnknown,
 
     /// The transaction was explicitly aborted by the user.
+    ///
+    /// # Note
+    ///
+    /// In transactional operations with a fallback path, an explicit abort will
+    /// immediately shift execution to the fallback path, regardless of whether
+    /// all attempts on the primary path have been exhausted.
     AbortExplicit {
         /// The user-provided reason for the abort.
         abort_reason: u8
