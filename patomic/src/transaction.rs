@@ -4,7 +4,7 @@
 //! Types used to configure transactional operations and inspect their
 //! outcomes.
 //!
-//! Transaction allow more complex operations to be performed, as well as
+//! Transactions allow for more complex operations to be performed, as well as
 //! operations on larger buffers.
 //!
 //! This comes with the drawback that a transactional operation might never
@@ -24,12 +24,12 @@ use crate::{SharedBytesRef, SharedFlagRef};
 /// A flag which can be provided to a transaction to intentionally cause it to
 /// abort.
 ///
-/// The flag is read at the start of each transaction attempt, and the attempt
-/// is aborted if the value is non-zero.
+/// The flag is read from at the start of each transaction attempt, and the
+/// attempt is aborted if the value is non-zero.
 ///
 /// Writing to the flag while it is being used in a live transaction operation
 /// will cause the transaction to abort. This is because any modification from
-/// outside the transaction to any memory in the cache line being used in a
+/// outside the transaction to any memory in a cache line being used by a
 /// transaction will cause the transaction to abort.
 ///
 /// The flag is padded to have its own cache line, in order to avoid false
@@ -61,13 +61,6 @@ impl TransactionFlag {
 
 /// Denotes the success or failure of a transaction, along with the reason for
 /// the failure.
-///
-/// # Note
-///
-/// This is separate to the actual operation itself failing, in operations with
-/// fallback paths where this is possible such as with `compare_exchange`. In
-/// such a case, the primary transaction would fail but the fallback transaction
-/// would succeed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TransactionExitCode {
     /// The transaction was started and committed successfully.
@@ -223,7 +216,7 @@ pub struct TransactionOutcomeWfb {
     ///
     /// # Note
     ///
-    /// The value of this field is unspecified is the primary transaction was
+    /// The value of this field is unspecified if the primary transaction was
     /// successful.
     pub fallback_attempts_made: u32,
 }
@@ -241,7 +234,7 @@ impl From<patomic_transaction_result_wfb_t> for TransactionOutcomeWfb {
     }
 }
 
-/// Used in double and multi variants of compare-exchange to pass multiple
+/// Used in double and multi variants of `compare_exchange` to pass multiple
 /// memory locations.
 ///
 /// # Note
@@ -315,7 +308,7 @@ impl From<TransactionConfig<'_>> for patomic_transaction_config_t {
     }
 }
 
-/// Used to configure the execution limits of primary and fallback transaction,
+/// Used to configure the execution limits of primary and fallback transactions,
 /// pass user-provided flags, and determine the byte width of all buffers passed
 /// to the transactions.
 ///
